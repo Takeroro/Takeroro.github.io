@@ -1,0 +1,664 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="iOS,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="项目在迭代到一定程度的时候，自然而然地，就有需求去将某部分功能的代码独立出来，这也是个必然经过的重构阶段。网上关于这部分的资料其实已经很全了，在这里我就总结一下这方面重构的感悟吧。 mov files这次commit log最多字眼字眼就是mov files了。一移动文件，svn肯定就有增有减的标记。一开始挺怕删的文件比加进去的多的，所以每次都数一下两者文件数量是否一致。在这个动作之前，肯定肯定会">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS项目部分代码独立子工程">
+<meta property="og:url" content="http://yoursite.com/2017/06/12/独立子工程/index.html">
+<meta property="og:site_name" content="I&#39;m Terrence">
+<meta property="og:description" content="项目在迭代到一定程度的时候，自然而然地，就有需求去将某部分功能的代码独立出来，这也是个必然经过的重构阶段。网上关于这部分的资料其实已经很全了，在这里我就总结一下这方面重构的感悟吧。 mov files这次commit log最多字眼字眼就是mov files了。一移动文件，svn肯定就有增有减的标记。一开始挺怕删的文件比加进去的多的，所以每次都数一下两者文件数量是否一致。在这个动作之前，肯定肯定会">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2017/06/12/独立子工程/2.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/06/12/独立子工程/3.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/06/12/独立子工程/4.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/06/12/独立子工程/5.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/06/12/独立子工程/1.jpg">
+<meta property="og:image" content="http://yoursite.com/2017/06/12/独立子工程/1-1.jpg">
+<meta property="og:updated_time" content="2019-06-23T11:44:49.846Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS项目部分代码独立子工程">
+<meta name="twitter:description" content="项目在迭代到一定程度的时候，自然而然地，就有需求去将某部分功能的代码独立出来，这也是个必然经过的重构阶段。网上关于这部分的资料其实已经很全了，在这里我就总结一下这方面重构的感悟吧。 mov files这次commit log最多字眼字眼就是mov files了。一移动文件，svn肯定就有增有减的标记。一开始挺怕删的文件比加进去的多的，所以每次都数一下两者文件数量是否一致。在这个动作之前，肯定肯定会">
+<meta name="twitter:image" content="http://yoursite.com/2017/06/12/独立子工程/2.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/12/独立子工程/">
+
+
+
+
+
+  <title> iOS项目部分代码独立子工程 | I'm Terrence </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">I'm Terrence</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/12/独立子工程/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Terrence">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="I'm Terrence">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="I'm Terrence" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                iOS项目部分代码独立子工程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-12T16:04:11+08:00">
+                2017-06-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>项目在迭代到一定程度的时候，自然而然地，就有需求去将某部分功能的代码独立出来，这也是个必然经过的重构阶段。<br>网上关于这部分的资料其实已经很全了，在这里我就总结一下这方面重构的感悟吧。</p>
+<h2 id="mov-files"><a href="#mov-files" class="headerlink" title="mov files"></a>mov files</h2><p>这次commit log最多字眼字眼就是mov files了。一移动文件，svn肯定就有增有减的标记。一开始挺怕删的文件比加进去的多的，所以每次都数一下两者文件数量是否一致。<br>在这个动作之前，肯定肯定会对要操作的文件进行showInFinder，打开了，发现这真是个有趣的地方。<br><em>不同习惯的开发者，创建新文件的风格是不同</em><br>习惯不好的，对xcode的文件结构即使已经分了group了，但show in finder进去一团糟。<br>在这里总结出第一条：<br><em>new file的时候，finder文件结构尽量和xcode目录结构一样，一个文件夹对应一个group</em></p>
+<p><em>还有有个小技巧：</em><br>每次改变finder文件结构后，最好都clean一下项目，然后再build,不然有大概率报错找不到头文件。</p>
+<h2 id="在子工程里面"><a href="#在子工程里面" class="headerlink" title="在子工程里面"></a>在子工程里面</h2><h3 id="Resource"><a href="#Resource" class="headerlink" title="Resource"></a>Resource</h3><p>这里应该是最麻烦的地方了。原来在主工程用到mainBundle的地方，通通要改成对应的子bundle。</p>
+<h4 id="bundle"><a href="#bundle" class="headerlink" title="bundle"></a>bundle</h4><p>创建子工程bundle具体操作如下图<br>上图<br><img src="/2017/06/12/独立子工程/2.jpg" title="new bundle 1"><br><img src="/2017/06/12/独立子工程/3.jpg" title="new bundle 2"><br><img src="/2017/06/12/独立子工程/4.jpg" title="add xib,img to bundle"><br><img src="/2017/06/12/独立子工程/5.jpg" title="add bundle to independece"></p>
+<h2 id="在主项目里面"><a href="#在主项目里面" class="headerlink" title="在主项目里面"></a>在主项目里面</h2><h3 id="Build-Settings-user-header-Search-paths"><a href="#Build-Settings-user-header-Search-paths" class="headerlink" title="Build Settings -> user header Search paths"></a>Build Settings -> user header Search paths</h3><img src="/2017/06/12/独立子工程/1.jpg" title="header paths">
+<h3 id="Build-Phases-link-binary-with-libaries"><a href="#Build-Phases-link-binary-with-libaries" class="headerlink" title="Build Phases -> link binary with libaries"></a>Build Phases -> link binary with libaries</h3><p>要在这里添加.a文件进去。</p>
+<h3 id="Build-Phases-Copy-Bundle-Resources"><a href="#Build-Phases-Copy-Bundle-Resources" class="headerlink" title="Build Phases -> Copy Bundle Resources"></a>Build Phases -> Copy Bundle Resources</h3><p>把子工程的资源文件.bundle添加进去。<br><img src="/2017/06/12/独立子工程/1-1.jpg" title="link binary, copo Bundle"></p>
+<h3 id="Build-Phases-Target-Dependencies"><a href="#Build-Phases-Target-Dependencies" class="headerlink" title="Build Phases -> Target Dependencies"></a>Build Phases -> Target Dependencies</h3><p>配置依赖，把在子工程添加进去。这样每次编译的时候，就会先把里面的子工程编译过了，再去搞主工程。没弄这个的话，每次一动子工程什么地方了，必须特定对那个子工程进行build···</p>
+<h2 id="子工程加载图片-imageName"><a href="#子工程加载图片-imageName" class="headerlink" title="子工程加载图片 imageName:?"></a>子工程加载图片 imageName:?</h2><p>从上面步骤下来，子工程用代码加载子bundle图片是加载不出来的，特别是iOS7，连xib 都load不出图片来。7以上是可以的。<br>因为直接用imageName：是有问题的,load 出来是nil来的。<br>看api才知道，imageName:是load from main bundle的，对于子bundle，代码要做如下处理</p>
+<pre><code>+ (NSString *)resourceName:(NSString *)name withBundleName:(NSString *)bundleName
+{
+    return [NSString stringWithFormat:@&quot;%@.bundle/%@&quot;, bundleName, name];
+}
+
++ (UIImage *)imageNamed:(NSString *)imageName withBundleName:(NSString *)bundleName
+{
+    NSBundle *bundle = [self bundleNamed:bundleName];
+    if (SystemLessThan(8.0)) {
+        NSString *path = [[bundle resourcePath] stringByAppendingPathComponent:imageName];
+        UIImage *image = [UIImage imageWithContentsOfFile:path];
+        return image;
+    }
+    else {
+        return [UIImage imageNamed:imageName inBundle:bundle compatibleWithTraitCollection:nil];
+    }
+}
+
++ (NSArray *)loadNibNamed:(NSString *)name owner:(id)owner withBundleName:(NSString *)bundleName
+{
+    NSBundle *bundle = [self bundleNamed:bundleName];
+    return [bundle loadNibNamed:name owner:owner options:nil];
+}
+
++ (NSBundle *)bundleNamed:(NSString *)bundleName
+{
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:bundleName ofType:@&quot;bundle&quot;];
+    return [NSBundle bundleWithPath:bundlePath];
+}
+</code></pre><p>这里需要特别注意，这个方法无法直接加载image assets里@2x图片，必须逐一把图片拉出来，然后加进bundle里面，才可以成功读取···</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/08/20173-6/" rel="next" title="圆角为何不圆？">
+                <i class="fa fa-chevron-left"></i> 圆角为何不圆？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/23/helloWorld/" rel="prev" title="C++">
+                C++ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Terrence">
+          <p class="site-author-name" itemprop="name">Terrence</p>
+          <p class="site-description motion-element" itemprop="description">上帝只救自救者</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#mov-files"><span class="nav-number">1.</span> <span class="nav-text">mov files</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在子工程里面"><span class="nav-number">2.</span> <span class="nav-text">在子工程里面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Resource"><span class="nav-number">2.1.</span> <span class="nav-text">Resource</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#bundle"><span class="nav-number">2.1.1.</span> <span class="nav-text">bundle</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在主项目里面"><span class="nav-number">3.</span> <span class="nav-text">在主项目里面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-Settings-user-header-Search-paths"><span class="nav-number">3.1.</span> <span class="nav-text">Build Settings -&gt; user header Search paths</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-Phases-link-binary-with-libaries"><span class="nav-number">3.2.</span> <span class="nav-text">Build Phases -&gt; link binary with libaries</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-Phases-Copy-Bundle-Resources"><span class="nav-number">3.3.</span> <span class="nav-text">Build Phases -&gt; Copy Bundle Resources</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Build-Phases-Target-Dependencies"><span class="nav-number">3.4.</span> <span class="nav-text">Build Phases -&gt; Target Dependencies</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#子工程加载图片-imageName"><span class="nav-number">4.</span> <span class="nav-text">子工程加载图片 imageName:?</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Terrence</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
