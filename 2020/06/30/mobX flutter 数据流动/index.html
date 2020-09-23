@@ -1,0 +1,676 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Flutter,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="背景MoTouch 项目中的状态管理大部分是基于 MobX 的， 使用方法就不在这里说了，详见 MobX官网。  使用过的同学们都知道，当 Observer builder 里面某个 MobX 属性发生改变时，就会自动刷新 Observer 了。但我一直有个疑问，为什么数据不用进行显式的绑定，到底是在哪里进行绑定的？如何才能确定某个属性已经被正确监听了？带着这些疑问，我们一起学习下源码。 类结构分">
+<meta name="keywords" content="Flutter">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MobX Flutter 数据流动原理篇">
+<meta property="og:url" content="http://yoursite.com/2020/06/30/mobX flutter 数据流动/index.html">
+<meta property="og:site_name" content="I&#39;m Terrence">
+<meta property="og:description" content="背景MoTouch 项目中的状态管理大部分是基于 MobX 的， 使用方法就不在这里说了，详见 MobX官网。  使用过的同学们都知道，当 Observer builder 里面某个 MobX 属性发生改变时，就会自动刷新 Observer 了。但我一直有个疑问，为什么数据不用进行显式的绑定，到底是在哪里进行绑定的？如何才能确定某个属性已经被正确监听了？带着这些疑问，我们一起学习下源码。 类结构分">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://emyms.bs2dl.yy.com/MzIyMDhlMzgtMThmMy00YzQ2LTg0NDUtMWVkYmJjOGZiNzUx.png">
+<meta property="og:image" content="http://emyms.bs2dl.yy.com/ZDc5OGRkYjAtYWJlZC00OTZjLWJhZGQtNzlmYTZhNTdlYzQ1.png">
+<meta property="og:image" content="http://emyms.bs2dl.yy.com/YTc1ZmY4MzAtMjk3Yy00MzA2LTkyZDctMjY2NDhmMmUzMDg2.png">
+<meta property="og:image" content="http://emyms.bs2dl.yy.com/NjM4ZWQ0MjgtOTc1My00ZGE5LTgyZDYtMDUwZjFlODI3ZjNh.png">
+<meta property="og:image" content="http://emyms.bs2dl.yy.com/MWFkZmY0YWMtNzM1OS00ZTVlLTk1YzUtMzA4NDBhMjU2ZWQz.png">
+<meta property="og:updated_time" content="2020-09-23T09:11:24.189Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MobX Flutter 数据流动原理篇">
+<meta name="twitter:description" content="背景MoTouch 项目中的状态管理大部分是基于 MobX 的， 使用方法就不在这里说了，详见 MobX官网。  使用过的同学们都知道，当 Observer builder 里面某个 MobX 属性发生改变时，就会自动刷新 Observer 了。但我一直有个疑问，为什么数据不用进行显式的绑定，到底是在哪里进行绑定的？如何才能确定某个属性已经被正确监听了？带着这些疑问，我们一起学习下源码。 类结构分">
+<meta name="twitter:image" content="http://emyms.bs2dl.yy.com/MzIyMDhlMzgtMThmMy00YzQ2LTg0NDUtMWVkYmJjOGZiNzUx.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/30/mobX flutter 数据流动/">
+
+
+
+
+
+  <title> MobX Flutter 数据流动原理篇 | I'm Terrence </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">I'm Terrence</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/30/mobX flutter 数据流动/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Terrence">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="I'm Terrence">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="I'm Terrence" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MobX Flutter 数据流动原理篇
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-06-30T17:23:17+08:00">
+                2020-06-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>MoTouch 项目中的状态管理大部分是基于 MobX 的， 使用方法就不在这里说了，详见 <a href="https://mobx.netlify.app/getting-started" target="_blank" rel="noopener">MobX官网</a>。</p>
+<p> 使用过的同学们都知道，当 Observer builder 里面某个 MobX 属性发生改变时，就会自动刷新 Observer 了。但我一直有个疑问，为什么数据不用进行显式的绑定，到底是在哪里进行绑定的？如何才能确定某个属性已经被正确监听了？带着这些疑问，我们一起学习下源码。</p>
+<h1 id="类结构分工"><a href="#类结构分工" class="headerlink" title="类结构分工"></a>类结构分工</h1><h2 id="Atom"><a href="#Atom" class="headerlink" title="Atom"></a>Atom</h2><p>被观察对象<br>Atom 对象是由 xxx.g.dart 生成, 实际上，我们每标记一个 @observable 属性，在 .g.dart 生成 getter 跟 setter 及对应的 atom, 通过 <code>_atom.reportRead()</code> 和 <code>_atom.reportWrite()</code> 来触发 ReactiveContext 的数据绑定及分发。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'package:mobx/mobx.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">part</span> <span class="string">'counter.g.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Counter</span> = <span class="title">_Counter</span> <span class="title">with</span> <span class="title">_</span>$<span class="title">Counter</span>; //外面实例化的是这个 <span class="title">Counter</span>， 实际上 是把<span class="title">_</span>$<span class="title">Counter</span> 这个 <span class="title">Mixin</span> 实例化了</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">abstract</span> <span class="title">class</span> <span class="title">_Counter</span> <span class="title">with</span> <span class="title">Store</span> </span>&#123;</span><br><span class="line">  <span class="meta">@observable</span></span><br><span class="line">  <span class="built_in">int</span> value = <span class="number">0</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@observable</span></span><br><span class="line">	ObservableMap&lt;<span class="built_in">String</span>, Size&gt; uidVideoSizeMap = ObservableMap();</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@action</span></span><br><span class="line">  <span class="keyword">void</span> increment() &#123;</span><br><span class="line">    value++;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">part</span> of <span class="string">'counter.dart'</span>;</span><br><span class="line"></span><br><span class="line">mixin _$Counter on _Counter, Store &#123;<span class="comment">// _$Counter 又继承了_Counter</span></span><br><span class="line">  <span class="keyword">final</span> _$valueAtom = Atom(name: <span class="string">'_Counter.value'</span>);</span><br><span class="line">  ···</span><br><span class="line">  <span class="keyword">final</span> _$uidVideoSizeMapAtom = Atom(name: <span class="string">'_Counter.uidVideoSizeMap'</span>);</span><br><span class="line">  ···</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Observer"><a href="#Observer" class="headerlink" title="Observer"></a>Observer</h2><h3 id="0-3-8"><a href="#0-3-8" class="headerlink" title="0.3.8"></a>0.3.8</h3><p>项目最早是用 0.3.8 版本的，很有印象，Observer 其核心就是个 StatefulWidget 而已，一旦数据变化，内部通过调用 setState(), 触发 State 的刷新，从而触发 builder 的刷新。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> invalidate() =&gt; setState(noOp);</span><br></pre></td></tr></table></figure>
+<h3 id="1-1-0"><a href="#1-1-0" class="headerlink" title="1.1.0"></a>1.1.0</h3><p>而到了 1.1.0 版本，Observer 的实现就有所不同了，不再是个StatefulWidget, 而是个 StatelessWidget了。主角是 elemtent , 核心通过 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void invalidate() =&gt; markNeedsBuild();</span><br></pre></td></tr></table></figure>
+<p>标记 当前 element 为 dirty, 在下一帧触发相应的 build 方法。</p>
+<h2 id="Reaction（ReactionImpl，Derivation）"><a href="#Reaction（ReactionImpl，Derivation）" class="headerlink" title="Reaction（ReactionImpl，Derivation）"></a>Reaction（ReactionImpl，Derivation）</h2><p>被 Observer 持有，封装数据绑定，更新回调方法。Reaction.run 回调给 Observer</p>
+<h2 id="ReactiveContext"><a href="#ReactiveContext" class="headerlink" title="ReactiveContext"></a>ReactiveContext</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">final ReactiveContext mainContext = createContext(config: ReactiveConfig.main);</span><br></pre></td></tr></table></figure>
+<p>是个巨大的单例，负责处理 Atom 跟 Reaction 的依赖关系, 及进行数据方法绑定、分发、解绑等逻辑。</p>
+<h1 id="数据流动过程"><a href="#数据流动过程" class="headerlink" title="数据流动过程"></a>数据流动过程</h1><h2 id="数据绑定"><a href="#数据绑定" class="headerlink" title="数据绑定"></a>数据绑定</h2><p> 整个数据绑定过程，在 0.3.8 版本是发生在 Observer State 的 build 里面，而在 1.1.0 版本，是在 Observer Element 的 build 方法体内。</p>
+<h3 id="1-start-tracking"><a href="#1-start-tracking" class="headerlink" title="1. start tracking"></a>1. start tracking</h3><p>在 ReactiveContext 单例记录当前的 derivation。<br><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Derivation _startTracking(Derivation derivation) &#123;</span><br><span class="line">    <span class="keyword">final</span> prevDerivation = _state.trackingDerivation;</span><br><span class="line">    _state.trackingDerivation = derivation;</span><br><span class="line"></span><br><span class="line">    _resetDerivationState(derivation);</span><br><span class="line">    derivation._newObservables = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> prevDerivation;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-reportObserved"><a href="#2-reportObserved" class="headerlink" title="2. reportObserved()"></a>2. reportObserved()</h3><p><img src="http://emyms.bs2dl.yy.com/MzIyMDhlMzgtMThmMy00YzQ2LTg0NDUtMWVkYmJjOGZiNzUx.png" alt="image-20200623114315072"></p>
+<p>看堆栈可以知道，对于每一次 @Observable 对象的 get 调用，实际上是  <code>atom.reportObserved()</code> ，最终调用ReaciveContext 的 <code>_reportObserved</code>。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> _reportObserved(Atom atom) &#123;</span><br><span class="line">    <span class="keyword">final</span> derivation = _state.trackingDerivation; </span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (derivation != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="comment">// 把 atom 加到当前的 derivation 的新观察队列里面</span></span><br><span class="line">      derivation._newObservables.add(atom);</span><br><span class="line">      <span class="keyword">if</span> (!atom._isBeingObserved) &#123;</span><br><span class="line">        atom</span><br><span class="line">          .._isBeingObserved = <span class="keyword">true</span></span><br><span class="line">          .._notifyOnBecomeObserved();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-endTracking"><a href="#3-endTracking" class="headerlink" title="3. endTracking"></a>3. endTracking</h3><p><img src="http://emyms.bs2dl.yy.com/ZDc5OGRkYjAtYWJlZC00OTZjLWJhZGQtNzlmYTZhNTdlYzQ1.png" alt="image-20200622143205460"></p>
+<p>把在 startTracking 跟 endTracking  之间， 所有被调用  <code>reportRead()</code> 的 atom， 绑定当前观察者 derivation 。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> _bindDependencies(Derivation derivation) &#123;</span><br><span class="line">  <span class="comment">// 这里对 Set 搞了两次difference， 目的是把新、旧 atoms 分开。旧的清空数据，新的绑定观察者</span></span><br><span class="line">  <span class="keyword">final</span> staleObservables =</span><br><span class="line">      derivation._observables.difference(derivation._newObservables);</span><br><span class="line">  <span class="keyword">final</span> newObservables =</span><br><span class="line">      derivation._newObservables.difference(derivation._observables);</span><br><span class="line">  <span class="keyword">var</span> lowestNewDerivationState = DerivationState.upToDate;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Add newly found observables</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">final</span> observable <span class="keyword">in</span> newObservables) &#123;</span><br><span class="line">    observable._addObserver(derivation);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Computed = Observable + Derivation</span></span><br><span class="line">    <span class="keyword">if</span> (observable <span class="keyword">is</span> Computed) &#123;</span><br><span class="line">      <span class="keyword">if</span> (observable._dependenciesState.index &gt;</span><br><span class="line">          lowestNewDerivationState.index) &#123;</span><br><span class="line">        lowestNewDerivationState = observable._dependenciesState;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Remove previous observables</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">final</span> ob <span class="keyword">in</span> staleObservables) &#123;</span><br><span class="line">    ob._removeObserver(derivation);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (lowestNewDerivationState != DerivationState.upToDate) &#123;</span><br><span class="line">    derivation</span><br><span class="line">      .._dependenciesState = lowestNewDerivationState</span><br><span class="line">      .._onBecomeStale();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  derivation</span><br><span class="line">    .._observables = derivation._newObservables</span><br><span class="line">    .._newObservables = &#123;&#125;; <span class="comment">// No need for newObservables beyond this point</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="数据更新"><a href="#数据更新" class="headerlink" title="数据更新"></a>数据更新</h2><h3 id="reportWrite"><a href="#reportWrite" class="headerlink" title="reportWrite()"></a>reportWrite()</h3><p>当数据更新 atom.reportWrite() 主要做了这两件事：</p>
+<ol>
+<li>更新 数据</li>
+<li>把 与之绑定 derivation (即 reaction) 加到队列。</li>
+</ol>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> reportWrite&lt;T&gt;(T newValue, T oldValue, <span class="keyword">void</span> <span class="built_in">Function</span>() setNewValue) &#123;</span><br><span class="line">  context.spyReport(ObservableValueSpyEvent(<span class="keyword">this</span>,</span><br><span class="line">      newValue: newValue, oldValue: oldValue, name: name));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ignore: cascade_invocations</span></span><br><span class="line">  context.conditionallyRunInAction(() &#123;</span><br><span class="line">    setNewValue();</span><br><span class="line">    reportChanged();<span class="comment">//触发 Context.addPendingReaction(reaction)</span></span><br><span class="line">  &#125;, <span class="keyword">this</span>, name: <span class="string">'<span class="subst">$&#123;name&#125;</span>_set'</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// ignore: cascade_invocations</span></span><br><span class="line">  context.spyReport(EndedSpyEvent(type: <span class="string">'observable'</span>, name: name));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 把 reaction 添加到队列, 这里 reaction 就是 ReactionImpl</span></span><br><span class="line"><span class="keyword">void</span> addPendingReaction(Reaction reaction) &#123;</span><br><span class="line">  _state.pendingReactions.add(reaction);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="数据分发"><a href="#数据分发" class="headerlink" title="数据分发"></a>数据分发</h2><h3 id="action"><a href="#action" class="headerlink" title="@action"></a>@action</h3><p><img src="http://emyms.bs2dl.yy.com/YTc1ZmY4MzAtMjk3Yy00MzA2LTkyZDctMjY2NDhmMmUzMDg2.png" alt="image-20200622151359216"></p>
+<h3 id="不带-action"><a href="#不带-action" class="headerlink" title="不带 @action"></a>不带 @action</h3><p><img src="http://emyms.bs2dl.yy.com/NjM4ZWQ0MjgtOTc1My00ZGE5LTgyZDYtMDUwZjFlODI3ZjNh.png" alt="image-20200622152046571"></p>
+<p>带不带 @action 的区别，其实就是 下面这个地方有没把 <code>ActionController</code> 传入来，数据流向其实是一样的，都会由 <code>controller.endAction(runInfo);</code> 来触发。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> conditionallyRunInAction(<span class="keyword">void</span> <span class="built_in">Function</span>() fn, Atom atom,</span><br><span class="line">    &#123;<span class="built_in">String</span> name, ActionController actionController&#125;) &#123;</span><br><span class="line">  <span class="keyword">if</span> (isWithinBatch) &#123;</span><br><span class="line">    enforceWritePolicy(atom);</span><br><span class="line">    fn();</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> controller = actionController ??</span><br><span class="line">        ActionController(</span><br><span class="line">            context: <span class="keyword">this</span>, name: name ?? nameFor(<span class="string">'conditionallyRunInAction'</span>));</span><br><span class="line">    <span class="keyword">final</span> runInfo = controller.startAction();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      enforceWritePolicy(atom);</span><br><span class="line">      fn();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      controller.endAction(runInfo);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> _runReactionsInternal() &#123;</span><br><span class="line">  _state.isRunningReactions = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//从队列读取 reaction</span></span><br><span class="line">  <span class="keyword">var</span> iterations = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">final</span> allReactions = _state.pendingReactions;</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (allReactions.isNotEmpty) &#123;</span><br><span class="line">    <span class="comment">// 这里是抛出死循环的情况</span></span><br><span class="line">    <span class="keyword">if</span> (++iterations == config.maxIterations) &#123;</span><br><span class="line">      <span class="keyword">final</span> failingReaction = allReactions[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Resetting ensures we have no bad-state left</span></span><br><span class="line">      _resetState();</span><br><span class="line"></span><br><span class="line">      <span class="keyword">throw</span> MobXCyclicReactionException(</span><br><span class="line">          <span class="string">"Reaction doesn't converge to a stable state after <span class="subst">$&#123;config.maxIterations&#125;</span> iterations. Probably there is a cycle in the reactive function: $failingReaction"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> remainingReactions = allReactions.toList(growable: <span class="keyword">false</span>);</span><br><span class="line">    allReactions.clear();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> reaction <span class="keyword">in</span> remainingReactions) &#123;</span><br><span class="line">      reaction._run();<span class="comment">//分发，回调给 Observer 层</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  _state</span><br><span class="line">    ..pendingReactions = []</span><br><span class="line">    ..isRunningReactions = <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="最终触发-rebuild"><a href="#最终触发-rebuild" class="headerlink" title="最终触发 rebuild"></a>最终触发 rebuild</h3><h4 id="0-3-8-1"><a href="#0-3-8-1" class="headerlink" title="0.3.8"></a>0.3.8</h4><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//observer.dart</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ObserverState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">Observer</span>&gt; </span>&#123;</span><br><span class="line">		<span class="keyword">void</span> invalidate() =&gt; setState(noOp);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="1-1-0-1"><a href="#1-1-0-1" class="headerlink" title="1.1.0"></a>1.1.0</h4><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">//observer_widget_mixin.dart</span></span><br><span class="line">	mixin ObserverElementMixin on ComponentElement &#123;</span><br><span class="line">	<span class="comment">//reaction.run 回调给 Observer 层，通过 markNeedsBuild 触发 rebuild</span></span><br><span class="line">	<span class="keyword">void</span> invalidate() =&gt; markNeedsBuild();</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="析构"><a href="#析构" class="headerlink" title="析构"></a>析构</h2><p>因为 MobX 里面存在一个 ReactiveContext 单例，那就涉及到对数据的清除绑定了</p>
+<p><img src="http://emyms.bs2dl.yy.com/MWFkZmY0YWMtNzM1OS00ZTVlLTk1YzUtMzA4NDBhMjU2ZWQz.png" alt="image-20200622164901647"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void _clearObservables(Derivation derivation) &#123;</span><br><span class="line">    final observables = derivation._observables;</span><br><span class="line">    derivation._observables = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    for (final x in observables) &#123;</span><br><span class="line">    //打破 atom 跟 reaction 的双向依赖</span><br><span class="line">      x._removeObserver(derivation);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    derivation._dependenciesState = DerivationState.notTracking;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h1><p>在实际开发过程中，我们项目会遇到一些数据更新了，但没触发 Observer rebuild 的一些疑问，在弄清楚数据流向后，现在可以基本解决了。</p>
+<p><code>Counter</code> 还是用上文那个例子,我们这次是对其中MobX 提供的 <code>ObservableMap</code> 进行监听，意图监听 map 的增减操作。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:flutter_mobx/flutter_mobx.dart'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:mobx/mobx.dart'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:motouch/UI/Me/counter.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CounterExample</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> CounterExample();</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  CounterExampleState createState() =&gt; CounterExampleState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CounterExampleState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">CounterExample</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> Counter counter = Counter();</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) =&gt; Scaffold(</span><br><span class="line">        appBar: AppBar(</span><br><span class="line">          backgroundColor: Colors.blue,</span><br><span class="line">          title: <span class="keyword">const</span> Text(<span class="string">'MobX Counter'</span>),</span><br><span class="line">        ),</span><br><span class="line">        body: Center(</span><br><span class="line">          child: Column(</span><br><span class="line">            mainAxisAlignment: MainAxisAlignment.center,</span><br><span class="line">            children: &lt;Widget&gt;[</span><br><span class="line">              Observer(</span><br><span class="line">                builder: (_) &#123;</span><br><span class="line">                  <span class="comment">//bind 1</span></span><br><span class="line">                  counter.uidVideoSizeMap;</span><br><span class="line"></span><br><span class="line">                  <span class="comment">//bind 2</span></span><br><span class="line"><span class="comment">//                  counter.uidVideoSizeMap.length;</span></span><br><span class="line">                  </span><br><span class="line">                  <span class="built_in">print</span>(<span class="string">'rebuild'</span>);</span><br><span class="line">                  <span class="keyword">return</span> Container();</span><br><span class="line">                &#125;,</span><br><span class="line">              ),</span><br><span class="line">              MaterialButton(</span><br><span class="line">                child: Text(<span class="string">'对 counter.uidVideoSizeMap 重新赋值'</span>),</span><br><span class="line">                onPressed: () &#123;</span><br><span class="line">                  <span class="comment">//update 1</span></span><br><span class="line">                  <span class="built_in">print</span>(<span class="string">'对 counter.uidVideoSizeMap 重新赋值'</span>);</span><br><span class="line">                  counter.uidVideoSizeMap = ObservableMap();</span><br><span class="line">                &#125;,</span><br><span class="line">              ),</span><br><span class="line">              MaterialButton(</span><br><span class="line">                child: Text(<span class="string">'counter.uidVideoSizeMap 增减元素'</span>),</span><br><span class="line">                onPressed: () &#123;</span><br><span class="line">                  <span class="comment">//update 2</span></span><br><span class="line">                  <span class="built_in">print</span>(<span class="string">'counter.uidVideoSizeMap 增减元素'</span>);</span><br><span class="line">                  counter.uidVideoSizeMap[<span class="string">'1'</span>] = Size.zero;</span><br><span class="line">                &#125;,</span><br><span class="line">              ),</span><br><span class="line">            ],</span><br><span class="line">          ),</span><br><span class="line">        ),</span><br><span class="line">      );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>分绑定分2种方式，我们先注释 bind 2，用 <code>counter.uidVideoSizeMap</code>绑定，看看打印结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">I/flutter (20534): 对 counter.uidVideoSizeMap 重新赋值</span><br><span class="line">I/flutter (20534): rebuild</span><br><span class="line">I/flutter (20534): 对 counter.uidVideoSizeMap 重新赋值</span><br><span class="line">I/flutter (20534): rebuild</span><br><span class="line">I/flutter (20534): 对 counter.uidVideoSizeMap 重新赋值</span><br><span class="line">I/flutter (20534): rebuild</span><br><span class="line">I/flutter (20534): counter.uidVideoSizeMap 增减元素</span><br><span class="line">I/flutter (20534): counter.uidVideoSizeMap 增减元素</span><br></pre></td></tr></table></figure>
+<p>可见，bind 1 这种方式，增减元素是不会引起 Observer 的 rebuild 的。</p>
+<p>再来看看注释 bind 1, 打开 <code>counter.uidVideoSizeMap.length</code>的结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">I/flutter (20534): 对 counter.uidVideoSizeMap 重新赋值</span><br><span class="line">I/flutter (20534): rebuild</span><br><span class="line">I/flutter (20534): 对 counter.uidVideoSizeMap 重新赋值</span><br><span class="line">I/flutter (20534): rebuild</span><br><span class="line">I/flutter (20534): counter.uidVideoSizeMap 增减元素</span><br><span class="line">I/flutter (20534): rebuild</span><br><span class="line">I/flutter (20534): counter.uidVideoSizeMap 增减元素</span><br></pre></td></tr></table></figure>
+<p>bind 2 的方式，无论是重新赋值，还是增减元素，都能引起 Observer 的 rebuild 。</p>
+<p>结合源码来分析，bind 1这种绑定方式：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//counter.g.dart</span></span><br><span class="line"><span class="comment">// 在 Observer builder 方法体内，每次 counter.uidVideoSizeMap, 触发的是 _Counter.uidVideoSizeMap 这个属性 atom 的 reportRead()， 绑定的是这个属性本身，跟 ObserverMap 的类型无关。</span></span><br><span class="line">  <span class="keyword">final</span> _$uidVideoSizeMapAtom = Atom(name: <span class="string">'_Counter.uidVideoSizeMap'</span>);</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  ObservableMap&lt;<span class="built_in">String</span>, Size&gt; <span class="keyword">get</span> uidVideoSizeMap &#123;</span><br><span class="line">    _$uidVideoSizeMapAtom.reportRead();<span class="comment">//内里调用 reportObserver()</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">super</span>.uidVideoSizeMap;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>bind 2:</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//observable_map.dart </span></span><br><span class="line"><span class="comment">// 在 Observer builder 方法体内，调用 counter.uidVideoSizeMap.length，是把 Observer_map 里面实现 的 _atom 给绑定了。</span></span><br><span class="line"><span class="meta">@override</span></span><br><span class="line">  <span class="built_in">int</span> <span class="keyword">get</span> length &#123;</span><br><span class="line">    _context.enforceReadPolicy(_atom);</span><br><span class="line"></span><br><span class="line">    _atom.reportObserved();<span class="comment">//绑定</span></span><br><span class="line">    <span class="keyword">return</span> _map.length;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>可见， bind 1, bind 2两种绑定方式，决定了 reaction 的不同， bind 1 那种方式完全把 uidVideoSizeMap 当成普通类型来用了，压根没有把 <code>ObservableMap</code> 类型带给我们便利给用上。</p>
+<p><code>ObservableList</code>, <code>ObservableSet</code> 也同理。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Flutter/" rel="tag"># Flutter</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/03/thunder 黑屏/" rel="next" title="Flutter 实战系列： 记一次视频区域黑屏问题分析与解决">
+                <i class="fa fa-chevron-left"></i> Flutter 实战系列： 记一次视频区域黑屏问题分析与解决
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/23/study swift/" rel="prev" title="Swift 学习笔记">
+                Swift 学习笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Terrence">
+          <p class="site-author-name" itemprop="name">Terrence</p>
+          <p class="site-description motion-element" itemprop="description">上帝只救自救者</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#类结构分工"><span class="nav-number">2.</span> <span class="nav-text">类结构分工</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Atom"><span class="nav-number">2.1.</span> <span class="nav-text">Atom</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Observer"><span class="nav-number">2.2.</span> <span class="nav-text">Observer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-3-8"><span class="nav-number">2.2.1.</span> <span class="nav-text">0.3.8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-0"><span class="nav-number">2.2.2.</span> <span class="nav-text">1.1.0</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reaction（ReactionImpl，Derivation）"><span class="nav-number">2.3.</span> <span class="nav-text">Reaction（ReactionImpl，Derivation）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ReactiveContext"><span class="nav-number">2.4.</span> <span class="nav-text">ReactiveContext</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据流动过程"><span class="nav-number">3.</span> <span class="nav-text">数据流动过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据绑定"><span class="nav-number">3.1.</span> <span class="nav-text">数据绑定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-start-tracking"><span class="nav-number">3.1.1.</span> <span class="nav-text">1. start tracking</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-reportObserved"><span class="nav-number">3.1.2.</span> <span class="nav-text">2. reportObserved()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-endTracking"><span class="nav-number">3.1.3.</span> <span class="nav-text">3. endTracking</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据更新"><span class="nav-number">3.2.</span> <span class="nav-text">数据更新</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#reportWrite"><span class="nav-number">3.2.1.</span> <span class="nav-text">reportWrite()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据分发"><span class="nav-number">3.3.</span> <span class="nav-text">数据分发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#action"><span class="nav-number">3.3.1.</span> <span class="nav-text">@action</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不带-action"><span class="nav-number">3.3.2.</span> <span class="nav-text">不带 @action</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最终触发-rebuild"><span class="nav-number">3.3.3.</span> <span class="nav-text">最终触发 rebuild</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#0-3-8-1"><span class="nav-number">3.3.3.1.</span> <span class="nav-text">0.3.8</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-0-1"><span class="nav-number">3.3.3.2.</span> <span class="nav-text">1.1.0</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#析构"><span class="nav-number">3.4.</span> <span class="nav-text">析构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用"><span class="nav-number">4.</span> <span class="nav-text">应用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Terrence</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

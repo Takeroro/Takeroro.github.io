@@ -84,17 +84,22 @@
 
 
 
-<meta name="description" content="C ++^1尽量不要使用指针和数组，因为太过底层，很可能出现不可预测的问题。尽量使用vector等对其的封装的高级用法。 引用 vs 指针引用 相当于变量的别名 int ivar = 1; int &amp;amp;i = ivar; int *pi = &amp;amp;ivar;  cout &amp;lt;&amp;lt; &amp;quot;i = &amp;quot;&amp;lt;&amp;lt; i &amp;lt;&amp;lt; endl; // 相当于i">
+<meta name="description" content="提问flutter 的 tabbar 都是这个样子居中的， 能不能不居中呢？一开始对了下那 tabbar api 中的几个属性， const TabBar({ Key key, @required this.tabs, this.controller, this.isScrollable = false, this.indicatorColor, this.indicatorWeight = 2.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C++">
-<meta property="og:url" content="http://yoursite.com/2019/06/23/helloWorld/index.html">
+<meta property="og:title" content="Flutter: tabBar一定要居中吗？">
+<meta property="og:url" content="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/index.html">
 <meta property="og:site_name" content="I&#39;m Terrence">
-<meta property="og:description" content="C ++^1尽量不要使用指针和数组，因为太过底层，很可能出现不可预测的问题。尽量使用vector等对其的封装的高级用法。 引用 vs 指针引用 相当于变量的别名 int ivar = 1; int &amp;amp;i = ivar; int *pi = &amp;amp;ivar;  cout &amp;lt;&amp;lt; &amp;quot;i = &amp;quot;&amp;lt;&amp;lt; i &amp;lt;&amp;lt; endl; // 相当于i">
+<meta property="og:description" content="提问flutter 的 tabbar 都是这个样子居中的， 能不能不居中呢？一开始对了下那 tabbar api 中的几个属性， const TabBar({ Key key, @required this.tabs, this.controller, this.isScrollable = false, this.indicatorColor, this.indicatorWeight = 2.">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-06-23T11:44:49.842Z">
+<meta property="og:image" content="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624114534451.png">
+<meta property="og:image" content="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624114534451.png">
+<meta property="og:image" content="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624114702642.png">
+<meta property="og:image" content="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624115311338.png">
+<meta property="og:updated_time" content="2020-09-23T09:11:24.188Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="C++">
-<meta name="twitter:description" content="C ++^1尽量不要使用指针和数组，因为太过底层，很可能出现不可预测的问题。尽量使用vector等对其的封装的高级用法。 引用 vs 指针引用 相当于变量的别名 int ivar = 1; int &amp;amp;i = ivar; int *pi = &amp;amp;ivar;  cout &amp;lt;&amp;lt; &amp;quot;i = &amp;quot;&amp;lt;&amp;lt; i &amp;lt;&amp;lt; endl; // 相当于i">
+<meta name="twitter:title" content="Flutter: tabBar一定要居中吗？">
+<meta name="twitter:description" content="提问flutter 的 tabbar 都是这个样子居中的， 能不能不居中呢？一开始对了下那 tabbar api 中的几个属性， const TabBar({ Key key, @required this.tabs, this.controller, this.isScrollable = false, this.indicatorColor, this.indicatorWeight = 2.">
+<meta name="twitter:image" content="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624114534451.png">
 
 
 
@@ -122,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/06/23/helloWorld/">
+  <link rel="canonical" href="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/">
 
 
 
 
 
-  <title> C++ | I'm Terrence </title>
+  <title> Flutter: tabBar一定要居中吗？ | I'm Terrence </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -231,7 +236,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/23/helloWorld/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/24/Flutter-tabBar一定要居中吗？/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Terrence">
@@ -255,7 +260,7 @@
             
             
               
-                C++
+                Flutter: tabBar一定要居中吗？
               
             
           </h1>
@@ -270,8 +275,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-06-23T19:44:49+08:00">
-                2019-06-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-06-24T10:18:05+08:00">
+                2019-06-24
               </time>
             
 
@@ -306,31 +311,52 @@
       
 
       
-        <h1 id="C-1"><a href="#C-1" class="headerlink" title="C ++^1"></a>C ++<a href="为什么我打不出C">^1</a></h1><p><em>尽量不要使用指针和数组，因为太过底层，很可能出现不可预测的问题。尽量使用vector等对其的封装的高级用法。</em></p>
-<h2 id="引用-vs-指针"><a href="#引用-vs-指针" class="headerlink" title="引用 vs 指针"></a>引用 vs 指针</h2><p><em>引用</em> 相当于变量的<strong>别名</strong></p>
-<pre><code>int ivar = 1;
-int &amp;i = ivar;
-int *pi = &amp;ivar;
+        <h2 id="提问"><a href="#提问" class="headerlink" title="提问"></a>提问</h2><p>flutter 的 tabbar 都是这个样子居中的，<br><img src="/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624114534451.png" title="充满整行"></p>
+<p>能不能不居中呢？<br>一开始对了下那 tabbar api 中的几个属性，</p>
+<pre><code>const TabBar({
+Key key,
+@required this.tabs,
+this.controller,
+this.isScrollable = false,
+this.indicatorColor,
+this.indicatorWeight = 2.0,
+this.indicatorPadding = EdgeInsets.zero,
+this.indicator,
+this.indicatorSize,
+this.labelColor,
+this.labelStyle,
+this.labelPadding,
+this.unselectedLabelColor,
+this.unselectedLabelStyle,
+this.dragStartBehavior = DragStartBehavior.start,
+this.onTap,}
+) 
+</code></pre><p>发现通过设置属性是不能达到预想效果，于是，弱弱地走去了人家官网提了个 issue， <a href="https://github.com/flutter/flutter/issues/34539" target="_blank" rel="noopener">can tabBar not centered ?</a>  过了几天，flutter 工程师还加了个这样标签 <a href="https://github.com/flutter/flutter/labels/f%3A%20material%20design" target="_blank" rel="noopener">f: material design</a> <a href="https://github.com/flutter/flutter/labels/framework" target="_blank" rel="noopener">framework</a> ，相当于承认了这个问题？哈哈</p>
+<h2 id="自问自答"><a href="#自问自答" class="headerlink" title="自问自答"></a>自问自答</h2><p><code>isScrollable</code> 这个属性默认是 false 的，把他设成 <code>isScrollable = true</code> 后，发现到有个细节改变了，由原来充满这一行的的表现，变成“收敛”了。</p>
+<img src="/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624114534451.png" title="充满整行">
+<img src="/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624114702642.png" title="收敛">
+<p>既然每个 tab 都收敛了，那么现在只剩下一个问题了：如何把整个 tabBar 向左对齐？</p>
+<p>我第一个想到的是，把 tabBar 用个 container 包裹着，设置下 alignment 不就行了？</p>
+<pre><code>Container(
+      alignment: Alignment.topLeft,
+      child: TabBar(
+        labelColor: Colors.black,
+        isScrollable: true,
+        labelStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        unselectedLabelColor: Colors.grey,
+        unselectedLabelStyle: TextStyle(fontSize: 11),
+        controller: _tabController,
+        tabs: tabs.map((e) =&gt; Tab(text: e)).toList(),
+      ),
+    )
+</code></pre><p>是的，指定<code>alignment: Alignment.topLeft</code>这样就可以实现这种效果了</p>
+<img src="/2019/06/24/Flutter-tabBar一定要居中吗？/image-20190624115311338.png" title="最终实现">
+<h2 id="延伸"><a href="#延伸" class="headerlink" title="延伸"></a>延伸</h2><p>如果需要放在 Scaffold.appBar 里面的话，则需要额外实现 <code>PreferredSizeWidget</code> 这个接口，<code>PreferredSize</code> 这个 widget 就实现了这个接口，我们用 <code>PreferredSize</code> 再包一层,即可。</p>
+<p>这里注意一下，<code>preferredSize</code> 这个属性， 并不是用来约束他的 child, 而是当这个组件本身没有设置任何约束时，对自己大小的一种声明。也就是说，如果外部对其是有约束的话，这个属性是用不着的。</p>
+<blockquote>
+<p>/// The size this widget would prefer if it were otherwise unconstrained.<br>/// A widget with a preferred size.<br>///<br>/// This widget does not impose any constraints on its child, and it doesn’t<br>/// affect the child’s layout in any way. It just advertises a preferred size<br>/// which can be used by the parent.</p>
+</blockquote>
 
-cout &lt;&lt; &quot;i = &quot;&lt;&lt; i &lt;&lt; endl; // 相当于i 为 ivar的别名
-cout &lt;&lt; &quot;pi = &quot;&lt;&lt; pi &lt;&lt; endl;
-cout &lt;&lt; &quot;*pi = &quot;&lt;&lt; *pi &lt;&lt; endl;
-cout &lt;&lt; &quot;&amp;i = &quot;&lt;&lt; &amp;i &lt;&lt; endl;
-cout &lt;&lt; &quot;&amp;ivar = &quot;&lt;&lt; &amp;ivar &lt;&lt; endl;
-</code></pre><hr>
-<p>i = 1<br>pi = 0x7fff5fbff73c<br>*pi = 1<br>&amp;i = 0x7fff5fbff73c</p>
-<h2 id="amp-ivar-0x7fff5fbff73c"><a href="#amp-ivar-0x7fff5fbff73c" class="headerlink" title=" &amp;ivar = 0x7fff5fbff73c"></a> &amp;ivar = 0x7fff5fbff73c</h2><p>表明指针就是存放对象<em>地址</em>的地方。</p>
-<h2 id="constant"><a href="#constant" class="headerlink" title="constant"></a>constant</h2><pre><code>const int *p = &amp;ivar;
-int a = 4;
-p = &amp;a;
-
-
-int * const conPtr = &amp;ivar;
-
-*conPtr  = 4;
-</code></pre><p><em>右边的总和不能变</em></p>
-<pre><code>const int * const bothConptr = &amp;ivar;
-</code></pre>
       
     </div>
 
@@ -356,8 +382,8 @@ int * const conPtr = &amp;ivar;
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/06/12/独立子工程/" rel="next" title="iOS项目部分代码独立子工程">
-                <i class="fa fa-chevron-left"></i> iOS项目部分代码独立子工程
+              <a href="/2018/05/20/helloWorld/" rel="next" title="C++">
+                <i class="fa fa-chevron-left"></i> C++
               </a>
             
           </div>
@@ -365,6 +391,10 @@ int * const conPtr = &amp;ivar;
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/28/Flutter-Overlay/" rel="prev" title="Flutter实战系列: 实现顶级视图可拖动悬浮窗">
+                Flutter实战系列: 实现顶级视图可拖动悬浮窗 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -432,7 +462,7 @@ int * const conPtr = &amp;ivar;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -443,7 +473,7 @@ int * const conPtr = &amp;ivar;
           
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
@@ -478,7 +508,7 @@ int * const conPtr = &amp;ivar;
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-1"><span class="nav-number">1.</span> <span class="nav-text">C ++^1</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#引用-vs-指针"><span class="nav-number">1.1.</span> <span class="nav-text">引用 vs 指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-ivar-0x7fff5fbff73c"><span class="nav-number">1.2.</span> <span class="nav-text"> &amp;ivar = 0x7fff5fbff73c</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#constant"><span class="nav-number">1.3.</span> <span class="nav-text">constant</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#提问"><span class="nav-number">1.</span> <span class="nav-text">提问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自问自答"><span class="nav-number">2.</span> <span class="nav-text">自问自答</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延伸"><span class="nav-number">3.</span> <span class="nav-text">延伸</span></a></li></ol></div>
             
 
           </div>
@@ -499,7 +529,7 @@ int * const conPtr = &amp;ivar;
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

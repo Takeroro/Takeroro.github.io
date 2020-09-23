@@ -1,0 +1,623 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Swift,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content=".self 跟 .Type 傻傻分不清Int.Type 是 Int 的元类型()，而 Int.Type 跟 Int.self 的关系，就是 Int 跟 5 的关系，一个是类型，一个是值 什么是元类型？我们通过元类型，去调用这个类的 static 方法,个人感觉，有点像 oc 被类对象的 isa 指针所指向的 meta Class 1234567Int.max//实际上等价于：Int.self.ma">
+<meta name="keywords" content="Swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift 学习笔记">
+<meta property="og:url" content="http://yoursite.com/2020/09/23/study swift/index.html">
+<meta property="og:site_name" content="I&#39;m Terrence">
+<meta property="og:description" content=".self 跟 .Type 傻傻分不清Int.Type 是 Int 的元类型()，而 Int.Type 跟 Int.self 的关系，就是 Int 跟 5 的关系，一个是类型，一个是值 什么是元类型？我们通过元类型，去调用这个类的 static 方法,个人感觉，有点像 oc 被类对象的 isa 指针所指向的 meta Class 1234567Int.max//实际上等价于：Int.self.ma">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-09-23T09:24:11.289Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swift 学习笔记">
+<meta name="twitter:description" content=".self 跟 .Type 傻傻分不清Int.Type 是 Int 的元类型()，而 Int.Type 跟 Int.self 的关系，就是 Int 跟 5 的关系，一个是类型，一个是值 什么是元类型？我们通过元类型，去调用这个类的 static 方法,个人感觉，有点像 oc 被类对象的 isa 指针所指向的 meta Class 1234567Int.max//实际上等价于：Int.self.ma">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/09/23/study swift/">
+
+
+
+
+
+  <title> Swift 学习笔记 | I'm Terrence </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">I'm Terrence</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/23/study swift/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Terrence">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="I'm Terrence">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="I'm Terrence" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Swift 学习笔记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-09-23T17:16:50+08:00">
+                2020-09-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="self-跟-Type-傻傻分不清"><a href="#self-跟-Type-傻傻分不清" class="headerlink" title=".self 跟 .Type 傻傻分不清"></a>.self 跟 .Type 傻傻分不清</h2><p>Int.Type 是 Int 的元类型()，而 Int.Type 跟 Int.self 的关系，就是 Int 跟 5 的关系，一个是类型，一个是值</p>
+<h2 id="什么是元类型？"><a href="#什么是元类型？" class="headerlink" title="什么是元类型？"></a>什么是元类型？</h2><p>我们通过元类型，去调用这个类的 static 方法,个人感觉，有点像 oc 被类对象的 isa 指针所指向的 meta Class</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Int.max</span><br><span class="line"></span><br><span class="line">//实际上等价于：</span><br><span class="line"></span><br><span class="line">Int.self.max</span><br><span class="line"></span><br><span class="line">//只是编译器帮我们省去了这个self</span><br></pre></td></tr></table></figure>
+<h2 id="protocol-Type"><a href="#protocol-Type" class="headerlink" title="protocol.Type?"></a>protocol.Type?</h2><p>首先 protocol 不是一个类型，只有他被一个类实现了，才具有元类型这个说法</p>
+<h2 id="show-me-the-code"><a href="#show-me-the-code" class="headerlink" title="show me the code"></a>show me the code</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">protocol MYStrategy &#123;</span><br><span class="line">    func cal() -&gt; Int</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class PlanA : MYStrategy &#123;</span><br><span class="line">    required init() &#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    func cal() -&gt; Int &#123;</span><br><span class="line">        return 1</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class  PlanB : MYStrategy &#123;</span><br><span class="line">    required init() &#123;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line">    func cal() -&gt; Int &#123;</span><br><span class="line">        return 2</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct PlanFactory &#123;</span><br><span class="line">    </span><br><span class="line">    /*</span><br><span class="line">        根据类型推断，免去传参的烦恼</span><br><span class="line">     */</span><br><span class="line">    static func createPlan&lt;T: MYStrategy&gt;() -&gt; T? &#123;</span><br><span class="line">        if let planA = T.self as? PlanA.Type &#123;</span><br><span class="line">            return planA.init() as? T</span><br><span class="line">        &#125;</span><br><span class="line">        if let planB = T.self as? PlanB.Type &#123;</span><br><span class="line">            return planB.init() as? T</span><br><span class="line">        &#125;</span><br><span class="line">        return nil</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    /*</span><br><span class="line">        type 传入的是一个元类型的值，由于 MYStrategy 是 protocol，这里传一个实现了 MYStrategy 的类的元类型的值即可</span><br><span class="line">     */</span><br><span class="line">    static func createPlanV2(type: MYStrategy.Type) -&gt; MYStrategy? &#123;</span><br><span class="line">        if type == PlanA.self &#123;</span><br><span class="line">            return PlanA()</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        if type == PlanB.self &#123;</span><br><span class="line">            return PlanB()</span><br><span class="line">        &#125;</span><br><span class="line">        return nil</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class MainTest &#123;</span><br><span class="line">    func test() &#123;</span><br><span class="line">        var plan:PlanA? = PlanFactory.createPlan()</span><br><span class="line">        </span><br><span class="line">        var planT = PlanFactory.createPlanV2(type: PlanA.self)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="type-of：-跟-self"><a href="#type-of：-跟-self" class="headerlink" title="type(of：) 跟 .self"></a>type(of：) 跟 .self</h2><p>相同点：都是获取 metaType (元类型)</p>
+<p>不同点：<code>type(of: value)</code>, 其中参数value 是个对象实例，主要用于动态获取 value 的 元类型；而 XXX.self 是静态获取 XXX 的元类型，其中 XXX 是个类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var testString = &quot;123&quot;</span><br><span class="line">var a = type(of: testString) //String</span><br><span class="line">var b = String.self     //String</span><br><span class="line">var c = testString.self // 123</span><br></pre></td></tr></table></figure>
+<h2 id="Self"><a href="#Self" class="headerlink" title="Self"></a>Self</h2><p>在协议中用得比较多用来表示遵循这个协议的对象<br>这里用例子自定义命名空间的例子来说明一下（仿照rxSwift）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">  这个 struct 作为命名空间 Xr </span><br><span class="line">  Base 是泛型</span><br><span class="line">*/</span><br><span class="line">public struct Xr&lt;Base&gt; &#123;</span><br><span class="line">    public let base: Base</span><br><span class="line">    public init(_ base: Base) &#123;</span><br><span class="line">        self.base = base</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">    协议 + 关联类型</span><br><span class="line">    一个静态 getter, 一个实例 getter</span><br><span class="line"> */</span><br><span class="line">public protocol XrCompatible &#123;</span><br><span class="line">    associatedtype XrBase</span><br><span class="line">    static var xr: Xr&lt;XrBase&gt;.Type &#123; get &#125;</span><br><span class="line">    var xr: Xr&lt;XrBase&gt; &#123; get &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">    扩展 XrCompatible，写默认实现</span><br><span class="line">    限定 Base 类型为 Self</span><br><span class="line"> */</span><br><span class="line">extension XrCompatible &#123;</span><br><span class="line">    </span><br><span class="line">    //这里的几个 Self， 是给 Xr 的&lt;Base&gt; 泛型做了限制，限制为遵循这个协议的对象本身</span><br><span class="line">    </span><br><span class="line">    //静态 xr getter,用于扩展类方法</span><br><span class="line">    public static var xr: Xr&lt;Self&gt;.Type &#123;</span><br><span class="line">        get &#123; Xr&lt;Self&gt;.self &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //实例 xr getter，用于扩展实例方法</span><br><span class="line">    public var xr: Xr&lt;Self&gt; &#123;</span><br><span class="line">        get &#123; Xr(self) &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">    赋予以下类 XrCompatible 的能力，可以直接用默认实现的两个 getter 来玩，让他们有了 XX.xr 的命名空间</span><br><span class="line"> */</span><br><span class="line">extension NSObject: XrCompatible &#123; &#125;</span><br><span class="line">extension String: XrCompatible &#123; &#125;</span><br><span class="line">extension Data: XrCompatible &#123; &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line">    对 Xr 且 base 是 String 类型的进行扩展，新增方法 appendHaha</span><br><span class="line"> */</span><br><span class="line">extension Xr where Base == String &#123;</span><br><span class="line">    func appendHaha() -&gt; String &#123;</span><br><span class="line">        return base+&quot;haha&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">let testString = &quot;123&quot;.xr.appendHaha()</span><br><span class="line">// 123haha</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Swift/" rel="tag"># Swift</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/30/mobX flutter 数据流动/" rel="next" title="MobX Flutter 数据流动原理篇">
+                <i class="fa fa-chevron-left"></i> MobX Flutter 数据流动原理篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Terrence">
+          <p class="site-author-name" itemprop="name">Terrence</p>
+          <p class="site-description motion-element" itemprop="description">上帝只救自救者</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#self-跟-Type-傻傻分不清"><span class="nav-number">1.</span> <span class="nav-text">.self 跟 .Type 傻傻分不清</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是元类型？"><span class="nav-number">2.</span> <span class="nav-text">什么是元类型？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#protocol-Type"><span class="nav-number">3.</span> <span class="nav-text">protocol.Type?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#show-me-the-code"><span class="nav-number">4.</span> <span class="nav-text">show me the code</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#type-of：-跟-self"><span class="nav-number">5.</span> <span class="nav-text">type(of：) 跟 .self</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Self"><span class="nav-number">6.</span> <span class="nav-text">Self</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Terrence</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
