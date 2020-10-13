@@ -1,0 +1,654 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="ffmpeg,日常,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="0x1背景前段时间去三亚深潜了，因为考证回来后第一次的 FD, 为了记录下所见的海底世界，临出发前在淘宝租了台 go pro 7。在整个使用过程中，除了2次无故的死机外，拍得还是挺顺心的。然后回来得把sd卡的视频转移到自己的电脑，这才发现，几天下来的视频已达到 80多g （一个 8 min 的视频就8g了），md,我的mac book 才多少g啊，哪吃得下！因此把这些视频压缩这个任务优先级已经很高">
+<meta name="keywords" content="ffmpeg,日常">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ffmpeg 实操">
+<meta property="og:url" content="http://yoursite.com/2020/10/12/ffmpeg 实操/index.html">
+<meta property="og:site_name" content="I&#39;m Terrence">
+<meta property="og:description" content="0x1背景前段时间去三亚深潜了，因为考证回来后第一次的 FD, 为了记录下所见的海底世界，临出发前在淘宝租了台 go pro 7。在整个使用过程中，除了2次无故的死机外，拍得还是挺顺心的。然后回来得把sd卡的视频转移到自己的电脑，这才发现，几天下来的视频已达到 80多g （一个 8 min 的视频就8g了），md,我的mac book 才多少g啊，哪吃得下！因此把这些视频压缩这个任务优先级已经很高">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-10-13T09:11:21.033Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ffmpeg 实操">
+<meta name="twitter:description" content="0x1背景前段时间去三亚深潜了，因为考证回来后第一次的 FD, 为了记录下所见的海底世界，临出发前在淘宝租了台 go pro 7。在整个使用过程中，除了2次无故的死机外，拍得还是挺顺心的。然后回来得把sd卡的视频转移到自己的电脑，这才发现，几天下来的视频已达到 80多g （一个 8 min 的视频就8g了），md,我的mac book 才多少g啊，哪吃得下！因此把这些视频压缩这个任务优先级已经很高">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/12/ffmpeg 实操/">
+
+
+
+
+
+  <title> ffmpeg 实操 | I'm Terrence </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">I'm Terrence</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/ffmpeg 实操/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Terrence">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="I'm Terrence">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="I'm Terrence" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                ffmpeg 实操
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-10-12T17:08:50+08:00">
+                2020-10-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="0x1背景"><a href="#0x1背景" class="headerlink" title="0x1背景"></a>0x1背景</h2><p>前段时间去三亚深潜了，因为考证回来后第一次的 FD, 为了记录下所见的海底世界，临出发前在淘宝租了台 go pro 7。在整个使用过程中，除了2次无故的死机外，拍得还是挺顺心的。然后回来得把sd卡的视频转移到自己的电脑，这才发现，几天下来的视频已达到 80多g （一个 8 min 的视频就8g了），md,我的mac book 才多少g啊，哪吃得下！<br>因此把这些视频压缩这个任务优先级已经很高了，在这个契机下，我去复习了下视频编解码相关的知识。</p>
+<h2 id="0x2-视频压缩（编码）"><a href="#0x2-视频压缩（编码）" class="headerlink" title="0x2 视频压缩（编码）"></a>0x2 视频压缩（编码）</h2><p>所谓视频，其实就是很多张图片，在一定时间内轮播完。比如，如果视频的帧率是24帧的，就是1秒内轮播完24张图片。go pro 的帧率在默认模式去到了60帧了，还能不大吗··<br>然后这里的压缩，就可以分为两种了，一种是帧内压缩，即图片压缩，另一种是帧间压缩，简要说来就是对于前后两帧，编码后面那帧时，只把基于前面那一帧不同的地方给编码，这样对于前后两帧差别不大的地方，压缩率是很高的。</p>
+<h3 id="0x2-1-ffmpeg"><a href="#0x2-1-ffmpeg" class="headerlink" title="0x2-1 ffmpeg"></a>0x2-1 ffmpeg</h3><p>ffmpeg 是一套功能强大的，开源的，音视频处理工具，功能包括但不限于包括<a href="https://baike.baidu.com/item/视频采集" target="_blank" rel="noopener">视频采集</a>功能、<a href="https://baike.baidu.com/item/视频格式转换" target="_blank" rel="noopener">视频格式转换</a>、视频抓图、给视频加水印等。</p>
+<h3 id="0x2-2-码率，-帧率，分辨率"><a href="#0x2-2-码率，-帧率，分辨率" class="headerlink" title="0x2-2 码率， 帧率，分辨率"></a>0x2-2 码率， 帧率，分辨率</h3><p>帧率 （FPS）：1s 中传输图片的的数量，主要影响视频的流畅度，帧率越高，流畅度越好，帧率越低，画面就越有跳跃感。视频一般的帧率有24就很流畅了，而 go pro 采集的时候有两种模式去到帧率去到 60 才有稳定的功能，导出的视频能不大才怪</p>
+<p>分辨率：图片的尺寸，分辨率越大，图片的尺寸就越大了</p>
+<p>码率：每 s 图片压缩后的数据量，而码率 x 时长就是视频的体积了。分辨率 x 帧率 = 每 s 在压缩前的数据量。</p>
+<p>在码率一定的情况下，分辨率与图像清晰度成反比关系，分辨率越大，图像就越不清晰。</p>
+<p>在分辨率一定的情况下，码率与图像清晰度成正比关系，码率越大，图像就越清晰。</p>
+<h3 id="0x2-3-压缩效果"><a href="#0x2-3-压缩效果" class="headerlink" title="0x2-3 压缩效果"></a>0x2-3 压缩效果</h3><p>可以尝试在帧率，分辨率，码率三个维度作下牺牲，来改变视频的体积。</p>
+<p>-r 改 帧率<br><code>ffmpeg -i input -r 24</code></p>
+<p>-s 改 分辨率<br><code>ffmpeg -i input -s 640x480</code></p>
+<p>-b:v 改 码率</p>
+<p><code>ffmpeg -i input -b:v 64k</code></p>
+<p>直接修改其中一个或多个参数，都可以来打到压缩体积的效果，但画质惨不忍睹啊，由于硬盘容量实在有限，原视频在写这篇日志之前已经删光了，无法上图对比··</p>
+<h3 id="0x2-4-h265"><a href="#0x2-4-h265" class="headerlink" title="0x2-4 h265"></a>0x2-4 h265</h3><p><code>ffmpeg -i input</code> 这句可以看到原来的视频已经是用了 h264 编码的了，业界其实还有一种更先进的 h265 编码，立刻去尝试下！</p>
+<p>安装 ffmpeg 这一块就不在这里详述了，这里主要在用 ffmpeg 进行 h265 编码遇到过的坑。</p>
+<p>H265 需要借助 libx265 的库，而通过 brew 的方式来安装 ffmpeg 的话，由于 homebrew 本身是不支持带有 options 的方式安装 ffmpeg , 所以这种方式无法一步到位地把 ffmpeg 跟 libx265 关联起来，这个时候，需要借助 <a href="https://link.zhihu.com/?target=https%3A//github.com/homebrew-ffmpeg/homebrew-ffmpeg" target="_blank" rel="noopener">homebrew-ffmpeg</a> 这个第三方库来给 ffmpeg 添加options 及 特性，而 这个库默认把 libx265 的能力添加进来了。</p>
+<p>按步骤执行以下几句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">brew install ffmpeg</span><br><span class="line"></span><br><span class="line">brew tap homebrew-ffmpeg/ffmpeg</span><br><span class="line"></span><br><span class="line">brew install homebrew-ffmpeg/ffmpeg/ffmpeg</span><br><span class="line"></span><br><span class="line">//关联 ffmpeg</span><br><span class="line">brew link ffmpeg</span><br></pre></td></tr></table></figure>
+<p>至此， 命令行的 ffmpeg 就有了 libx265 的能力了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i /Users/mac/Desktop/mp4/GH010105.MP4 -c:v libx265  /Users/mac/Documents/newFiles/GH010105_h265_1.mp4</span><br></pre></td></tr></table></figure>
+<p>原体积 8g 的 时长 8min的 MP4文件，经 h265 转换后，体积为 300M+，视频展示效果从肉眼上已经很难分辨出有什么不同，经过老婆的检验，清晰度是 ok 的。唯一有点不足的是，转换时间太长了，转换60+个文件，用下面这个批量脚本去跑，跑了一整天才全部完成··</p>
+<h3 id="批量转-h265"><a href="#批量转-h265" class="headerlink" title="批量转 h265"></a>批量转 h265</h3><p>要转视频实在太多了，于是用 python 写了个批量转换 h265 的脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python /Users/mac/Documents/pythonTest/test.py /Users/mac/Desktop/mp4  /Users/mac/Desktop/mp4Output</span><br></pre></td></tr></table></figure>
+<p>指定输入文件夹，输出文件夹即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> os </span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getFilesIn</span><span class="params">(path)</span> :</span></span><br><span class="line">	g = os.walk(path)  </span><br><span class="line">	sourceFileList = []</span><br><span class="line">	<span class="keyword">for</span> path,dir_list,file_list <span class="keyword">in</span> g:  </span><br><span class="line">	    <span class="keyword">for</span> file_name <span class="keyword">in</span> file_list:  </span><br><span class="line">	        sourceFileList.append(os.path.join(path, file_name))</span><br><span class="line">	<span class="keyword">return</span> sourceFileList</span><br><span class="line"></span><br><span class="line"><span class="comment"># ffmpeg -i /Users/mac/Desktop/mp4/GH010105.MP4 -c:v libx265  /Users/mac/Documents/newFiles/GH010105_h265_1.mp4</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convertToH265</span><span class="params">(file)</span>:</span></span><br><span class="line">	print(<span class="string">"############"</span>)</span><br><span class="line">	outputFilePath = outputPath +<span class="string">'/'</span>+ os.path.basename(file)</span><br><span class="line">	print(<span class="string">"输出文件："</span>+outputFilePath)</span><br><span class="line">	print(file)</span><br><span class="line">	print(<span class="string">"======="</span>)</span><br><span class="line">	print(os.system(<span class="string">'ffmpeg -i '</span> + str(file) + <span class="string">" -c:v libx265 "</span> + outputFilePath))</span><br><span class="line"></span><br><span class="line">args = sys.argv</span><br><span class="line"><span class="keyword">print</span> (args[<span class="number">1</span>])</span><br><span class="line">inputPath = args[<span class="number">1</span>]</span><br><span class="line">outputPath = args[<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">print(<span class="string">"输入路径："</span>+inputPath)</span><br><span class="line">print(<span class="string">"输出路径："</span>+outputPath)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> getFilesIn(inputPath):</span><br><span class="line">	print(<span class="string">"开始转换： "</span>+file+<span class="string">"  basename: "</span>+os.path.basename(file))</span><br><span class="line">	convertToH265(file)</span><br></pre></td></tr></table></figure>
+<h3 id="视频合并"><a href="#视频合并" class="headerlink" title="视频合并"></a>视频合并</h3><p>这个需求是来源于从go pro 导出的时长较长的mp4，都被分拆出好几个duration 是有 8 min 的子文件了，在解决完压缩问题后，我们在看看要怎么把分拆过的视频合并起来。</p>
+<h4 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h4><p><code>ffmpeg -i &quot;concat:FD1-1.MP4|FD1-2.MP4|&quot; -c copy FD1-con.mp4</code></p>
+<p>但是失败，结果还是只有FD1-1的内容，见有warning<br>Found duplicated MOOV Atom. Skipped it</p>
+<p>输出只含有第一个文件的信息，我们再用方法2试下</p>
+<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><ol>
+<li>创建一个文件 concatFile.txt，把需要合并的文件名称写进去：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">file &apos;FD2-1.MP4&apos;</span><br><span class="line">file &apos;FD2-2.MP4&apos;</span><br><span class="line">file &apos;FD2-3.MP4&apos;</span><br><span class="line">file &apos;FD2-4.MP4&apos;</span><br><span class="line">file &apos;FD2-5.MP4&apos;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>执行</p>
+<p><code>ffmpeg -f concat -i concatFile.txt -c copy fd2output.mp4</code></p>
+</li>
+</ol>
+<p>查看输出结果 fd2output.mp4， 已成功合并了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>学习技术， 无非是为了解决实际问题，技术再好，境界越高，若未能落地应用，也是空中楼阁而已。这次能通过编码的方式来解决来源于生活的问题，有作为技术人的一种自豪感啊。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ffmpeg-日常/" rel="tag"># ffmpeg,日常</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/23/study swift/" rel="next" title="Swift 学习笔记">
+                <i class="fa fa-chevron-left"></i> Swift 学习笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Terrence">
+          <p class="site-author-name" itemprop="name">Terrence</p>
+          <p class="site-description motion-element" itemprop="description">上帝只救自救者</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x1背景"><span class="nav-number">1.</span> <span class="nav-text">0x1背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x2-视频压缩（编码）"><span class="nav-number">2.</span> <span class="nav-text">0x2 视频压缩（编码）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0x2-1-ffmpeg"><span class="nav-number">2.1.</span> <span class="nav-text">0x2-1 ffmpeg</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x2-2-码率，-帧率，分辨率"><span class="nav-number">2.2.</span> <span class="nav-text">0x2-2 码率， 帧率，分辨率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x2-3-压缩效果"><span class="nav-number">2.3.</span> <span class="nav-text">0x2-3 压缩效果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#0x2-4-h265"><span class="nav-number">2.4.</span> <span class="nav-text">0x2-4 h265</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#批量转-h265"><span class="nav-number">2.5.</span> <span class="nav-text">批量转 h265</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#视频合并"><span class="nav-number">2.6.</span> <span class="nav-text">视频合并</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#方法1"><span class="nav-number">2.6.1.</span> <span class="nav-text">方法1</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法2"><span class="nav-number">2.7.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Terrence</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

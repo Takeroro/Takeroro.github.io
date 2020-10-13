@@ -232,6 +232,165 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/12/ffmpeg 实操/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Terrence">
+    <meta itemprop="description" content>
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="I'm Terrence">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="I'm Terrence" src>
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2020/10/12/ffmpeg 实操/" itemprop="url">
+                  ffmpeg 实操
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-10-12T17:08:50+08:00">
+                2020-10-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="0x1背景"><a href="#0x1背景" class="headerlink" title="0x1背景"></a>0x1背景</h2><p>前段时间去三亚深潜了，因为考证回来后第一次的 FD, 为了记录下所见的海底世界，临出发前在淘宝租了台 go pro 7。在整个使用过程中，除了2次无故的死机外，拍得还是挺顺心的。然后回来得把sd卡的视频转移到自己的电脑，这才发现，几天下来的视频已达到 80多g （一个 8 min 的视频就8g了），md,我的mac book 才多少g啊，哪吃得下！<br>因此把这些视频压缩这个任务优先级已经很高了，在这个契机下，我去复习了下视频编解码相关的知识。</p>
+<h2 id="0x2-视频压缩（编码）"><a href="#0x2-视频压缩（编码）" class="headerlink" title="0x2 视频压缩（编码）"></a>0x2 视频压缩（编码）</h2><p>所谓视频，其实就是很多张图片，在一定时间内轮播完。比如，如果视频的帧率是24帧的，就是1秒内轮播完24张图片。go pro 的帧率在默认模式去到了60帧了，还能不大吗··<br>然后这里的压缩，就可以分为两种了，一种是帧内压缩，即图片压缩，另一种是帧间压缩，简要说来就是对于前后两帧，编码后面那帧时，只把基于前面那一帧不同的地方给编码，这样对于前后两帧差别不大的地方，压缩率是很高的。</p>
+<h3 id="0x2-1-ffmpeg"><a href="#0x2-1-ffmpeg" class="headerlink" title="0x2-1 ffmpeg"></a>0x2-1 ffmpeg</h3><p>ffmpeg 是一套功能强大的，开源的，音视频处理工具，功能包括但不限于包括<a href="https://baike.baidu.com/item/视频采集" target="_blank" rel="noopener">视频采集</a>功能、<a href="https://baike.baidu.com/item/视频格式转换" target="_blank" rel="noopener">视频格式转换</a>、视频抓图、给视频加水印等。</p>
+<h3 id="0x2-2-码率，-帧率，分辨率"><a href="#0x2-2-码率，-帧率，分辨率" class="headerlink" title="0x2-2 码率， 帧率，分辨率"></a>0x2-2 码率， 帧率，分辨率</h3><p>帧率 （FPS）：1s 中传输图片的的数量，主要影响视频的流畅度，帧率越高，流畅度越好，帧率越低，画面就越有跳跃感。视频一般的帧率有24就很流畅了，而 go pro 采集的时候有两种模式去到帧率去到 60 才有稳定的功能，导出的视频能不大才怪</p>
+<p>分辨率：图片的尺寸，分辨率越大，图片的尺寸就越大了</p>
+<p>码率：每 s 图片压缩后的数据量，而码率 x 时长就是视频的体积了。分辨率 x 帧率 = 每 s 在压缩前的数据量。</p>
+<p>在码率一定的情况下，分辨率与图像清晰度成反比关系，分辨率越大，图像就越不清晰。</p>
+<p>在分辨率一定的情况下，码率与图像清晰度成正比关系，码率越大，图像就越清晰。</p>
+<h3 id="0x2-3-压缩效果"><a href="#0x2-3-压缩效果" class="headerlink" title="0x2-3 压缩效果"></a>0x2-3 压缩效果</h3><p>可以尝试在帧率，分辨率，码率三个维度作下牺牲，来改变视频的体积。</p>
+<p>-r 改 帧率<br><code>ffmpeg -i input -r 24</code></p>
+<p>-s 改 分辨率<br><code>ffmpeg -i input -s 640x480</code></p>
+<p>-b:v 改 码率</p>
+<p><code>ffmpeg -i input -b:v 64k</code></p>
+<p>直接修改其中一个或多个参数，都可以来打到压缩体积的效果，但画质惨不忍睹啊，由于硬盘容量实在有限，原视频在写这篇日志之前已经删光了，无法上图对比··</p>
+<h3 id="0x2-4-h265"><a href="#0x2-4-h265" class="headerlink" title="0x2-4 h265"></a>0x2-4 h265</h3><p><code>ffmpeg -i input</code> 这句可以看到原来的视频已经是用了 h264 编码的了，业界其实还有一种更先进的 h265 编码，立刻去尝试下！</p>
+<p>安装 ffmpeg 这一块就不在这里详述了，这里主要在用 ffmpeg 进行 h265 编码遇到过的坑。</p>
+<p>H265 需要借助 libx265 的库，而通过 brew 的方式来安装 ffmpeg 的话，由于 homebrew 本身是不支持带有 options 的方式安装 ffmpeg , 所以这种方式无法一步到位地把 ffmpeg 跟 libx265 关联起来，这个时候，需要借助 <a href="https://link.zhihu.com/?target=https%3A//github.com/homebrew-ffmpeg/homebrew-ffmpeg" target="_blank" rel="noopener">homebrew-ffmpeg</a> 这个第三方库来给 ffmpeg 添加options 及 特性，而 这个库默认把 libx265 的能力添加进来了。</p>
+<p>按步骤执行以下几句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">brew install ffmpeg</span><br><span class="line"></span><br><span class="line">brew tap homebrew-ffmpeg/ffmpeg</span><br><span class="line"></span><br><span class="line">brew install homebrew-ffmpeg/ffmpeg/ffmpeg</span><br><span class="line"></span><br><span class="line">//关联 ffmpeg</span><br><span class="line">brew link ffmpeg</span><br></pre></td></tr></table></figure>
+<p>至此， 命令行的 ffmpeg 就有了 libx265 的能力了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -i /Users/mac/Desktop/mp4/GH010105.MP4 -c:v libx265  /Users/mac/Documents/newFiles/GH010105_h265_1.mp4</span><br></pre></td></tr></table></figure>
+<p>原体积 8g 的 时长 8min的 MP4文件，经 h265 转换后，体积为 300M+，视频展示效果从肉眼上已经很难分辨出有什么不同，经过老婆的检验，清晰度是 ok 的。唯一有点不足的是，转换时间太长了，转换60+个文件，用下面这个批量脚本去跑，跑了一整天才全部完成··</p>
+<h3 id="批量转-h265"><a href="#批量转-h265" class="headerlink" title="批量转 h265"></a>批量转 h265</h3><p>要转视频实在太多了，于是用 python 写了个批量转换 h265 的脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python /Users/mac/Documents/pythonTest/test.py /Users/mac/Desktop/mp4  /Users/mac/Desktop/mp4Output</span><br></pre></td></tr></table></figure>
+<p>指定输入文件夹，输出文件夹即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="comment"># -*- coding: UTF-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> os </span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getFilesIn</span><span class="params">(path)</span> :</span></span><br><span class="line">	g = os.walk(path)  </span><br><span class="line">	sourceFileList = []</span><br><span class="line">	<span class="keyword">for</span> path,dir_list,file_list <span class="keyword">in</span> g:  </span><br><span class="line">	    <span class="keyword">for</span> file_name <span class="keyword">in</span> file_list:  </span><br><span class="line">	        sourceFileList.append(os.path.join(path, file_name))</span><br><span class="line">	<span class="keyword">return</span> sourceFileList</span><br><span class="line"></span><br><span class="line"><span class="comment"># ffmpeg -i /Users/mac/Desktop/mp4/GH010105.MP4 -c:v libx265  /Users/mac/Documents/newFiles/GH010105_h265_1.mp4</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convertToH265</span><span class="params">(file)</span>:</span></span><br><span class="line">	print(<span class="string">"############"</span>)</span><br><span class="line">	outputFilePath = outputPath +<span class="string">'/'</span>+ os.path.basename(file)</span><br><span class="line">	print(<span class="string">"输出文件："</span>+outputFilePath)</span><br><span class="line">	print(file)</span><br><span class="line">	print(<span class="string">"======="</span>)</span><br><span class="line">	print(os.system(<span class="string">'ffmpeg -i '</span> + str(file) + <span class="string">" -c:v libx265 "</span> + outputFilePath))</span><br><span class="line"></span><br><span class="line">args = sys.argv</span><br><span class="line"><span class="keyword">print</span> (args[<span class="number">1</span>])</span><br><span class="line">inputPath = args[<span class="number">1</span>]</span><br><span class="line">outputPath = args[<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">print(<span class="string">"输入路径："</span>+inputPath)</span><br><span class="line">print(<span class="string">"输出路径："</span>+outputPath)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> getFilesIn(inputPath):</span><br><span class="line">	print(<span class="string">"开始转换： "</span>+file+<span class="string">"  basename: "</span>+os.path.basename(file))</span><br><span class="line">	convertToH265(file)</span><br></pre></td></tr></table></figure>
+<h3 id="视频合并"><a href="#视频合并" class="headerlink" title="视频合并"></a>视频合并</h3><p>这个需求是来源于从go pro 导出的时长较长的mp4，都被分拆出好几个duration 是有 8 min 的子文件了，在解决完压缩问题后，我们在看看要怎么把分拆过的视频合并起来。</p>
+<h4 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h4><p><code>ffmpeg -i &quot;concat:FD1-1.MP4|FD1-2.MP4|&quot; -c copy FD1-con.mp4</code></p>
+<p>但是失败，结果还是只有FD1-1的内容，见有warning<br>Found duplicated MOOV Atom. Skipped it</p>
+<p>输出只含有第一个文件的信息，我们再用方法2试下</p>
+<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><ol>
+<li>创建一个文件 concatFile.txt，把需要合并的文件名称写进去：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">file &apos;FD2-1.MP4&apos;</span><br><span class="line">file &apos;FD2-2.MP4&apos;</span><br><span class="line">file &apos;FD2-3.MP4&apos;</span><br><span class="line">file &apos;FD2-4.MP4&apos;</span><br><span class="line">file &apos;FD2-5.MP4&apos;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>执行</p>
+<p><code>ffmpeg -f concat -i concatFile.txt -c copy fd2output.mp4</code></p>
+</li>
+</ol>
+<p>查看输出结果 fd2output.mp4， 已成功合并了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>学习技术， 无非是为了解决实际问题，技术再好，境界越高，若未能落地应用，也是空中楼阁而已。这次能通过编码的方式来解决来源于生活的问题，有作为技术人的一种自豪感啊。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/23/study swift/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1614,338 +1773,6 @@ p = &amp;a;
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/20/1-20/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Terrence">
-    <meta itemprop="description" content>
-    <meta itemprop="image" content="/images/avatar.gif">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="I'm Terrence">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="I'm Terrence" src>
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/01/20/1-20/" itemprop="url">
-                  程序员修炼之路—从小工到专家—读书笔记
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-20T14:15:55+08:00">
-                2017-01-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>书读了一遍，还在我桌面，希望有空能常翻翻回味回味，有新参透也在这里补充。</p>
-<h2 id="破窗子理论"><a href="#破窗子理论" class="headerlink" title="破窗子理论"></a>破窗子理论</h2><p>发现一个bug,或者代码不工整的地方，立马fix好。若留着不修，破窗子会越来越多，这样整个项目会慢慢恶化腐烂下去。</p>
-<h2 id="注重交流"><a href="#注重交流" class="headerlink" title="注重交流"></a>注重交流</h2><h2 id="DRY原则-Don’t-Repeat-Yourself"><a href="#DRY原则-Don’t-Repeat-Yourself" class="headerlink" title="DRY原则 Don’t Repeat Yourself"></a>DRY原则 Don’t Repeat Yourself</h2><p>重复分为强加性重复，无意性重复，无耐性重复以及开发人员之间的重复。觉得最容易重复的是无耐性重复，因为相同的动作、需求，去拷贝一个大致相同的函数，修改一些参数去实现类似的功能，看似合理又省事，但的确会留下隐患（将来有改动就得处处改了）。应更多考虑用设计模式来优化代码结构。如项目中WebService 中内聚处理了接口返回码resCode,内聚处理网络错误提示，而不是每次请求都重复去判断resCode == 1；开发人员之间的重复，就涉及代码架构同分工了，最明显的就是重复造轮子，事倍功半。</p>
-<h2 id="正交性"><a href="#正交性" class="headerlink" title="正交性"></a>正交性</h2><h3 id="what"><a href="#what" class="headerlink" title="what"></a>what</h3><p>该术语表示某种不相依赖性或者解耦性。如果两个或更多食物中的一个发生变化，不会影响其他事物，这些事物就是正交的。在设计良好的系统中，数据库代码与用户界面是正交的：你可以改动界面，而不影响数据库；更换数据库，而不用改动接界面。</p>
-<blockquote>
-<p>Eliminate Effects Between Unrelated Things (消除无关事物之间的影响)<br>设计自足（self-contained）的组件:<em>独立</em>，具有<em>单一，良好定义的目的（内聚性）</em>。如果组件是相互隔离的，你就知道你能够改变其中之一，而不用担心其余组件。只要你<em>不改变组件的外部接口</em>，就不会造成波及整个系统的问题。</p>
-</blockquote>
-<h3 id="how"><a href="#how" class="headerlink" title="how"></a>how</h3><ul>
-<li><em>让你的代码保持解耦。</em>编写“羞怯”的代码—就是不会没有必要地向其他模块暴露任何事请、也不依赖其他模块的实现。e.g.如果需要改变对象的状态，让这个对象替你去做，（即让这个对象提供接口，你去调用就可以了），这样，代码就会保持与其他代码的实现的隔离。</li>
-<li><em>避免使用全局数据 。</em>（多线程的时候有可能有麻烦）一般而言，所需的任何语境（context）显式地传入模块，代码会更易于理解和维护。</li>
-<li><em>避免编写相似的函数。</em>看起来很像的一组函数—他们也许在开始和结束处共享公共的代码，中间的算法却各有不同。重复的代码是结构问题的一种症状。<br>养成不断地<em>批判对待</em>自己代码的习惯，寻找任何重新进行组织，以改善其结构和正交性的机会。 这个过程叫重构。</li>
-</ul>
-<h2 id="可撤销性"><a href="#可撤销性" class="headerlink" title="可撤销性"></a>可撤销性</h2><blockquote>
-<p>there are no final decisions,不存在最终决策。<br>设计灵活的结构去保证需求的变动不至于致命。这样的结构最大的特点是具有正交性，即常说的内部低耦合，层层分离。<br>刚好碰到一个切身相关的例子：这段时间需要将项目的sdk换成欢聚云的sdk,才发现项目之初，就已经把原来用的sdk封装了一层model，再去用。这样巧妙的设计让现在换sdk的时候只需到封装的那层model改就可以了。不然，要是以前一开始就各自为政，随意到处调用sdk的话，就得跑去UI层去处处改就GG了T.T</p>
-</blockquote>
-<h2 id="拽光弹"><a href="#拽光弹" class="headerlink" title="拽光弹"></a>拽光弹</h2><p><em>主要实现了组件间（模块间）端到端的连接，用以检查你离目标有多远，并在必要的情况下进行调整。</em><br>拽光代码并非用过就扔的代码：你编写它，就是为了保留它。它含有任何一段产品代码都拥有的完整个的错误检查、结构、文档以及自查。只是功能不全而已。<br>虽然简约但是完整，并且构成了最终系统骨架的一部分。</p>
-<h2 id="原型"><a href="#原型" class="headerlink" title="原型"></a>原型</h2><h3 id="what-1"><a href="#what-1" class="headerlink" title="what"></a>what</h3><p>用过就扔的代码，或者就是用笔画出来的草图</p>
-<h3 id="when"><a href="#when" class="headerlink" title="when"></a>when</h3><p>可以为下列情况制作原型：</p>
-<ul>
-<li>架构</li>
-<li>已有系统的新功能</li>
-<li>外部数据的结构或内存</li>
-<li>第三方工具或组件</li>
-<li>性能问题</li>
-<li>用户界面设计<br><em>原型制作是一种学习经验。其价值并不在于所产生的代码，而在于所学到的经验教训</em></li>
-</ul>
-<h3 id="how-1"><a href="#how-1" class="headerlink" title="how"></a>how</h3><p>checkList:</p>
-<ul>
-<li>主要组件的责任是否得到了良好定义?是否恰当？</li>
-<li>主要组件间的协作是否得到良好的定义？</li>
-<li>耦合是否得意最小化?</li>
-<li>能否确定重复的潜在来源？</li>
-<li>接口定义和各项约束是否可接受？</li>
-<li>每个模块在执行过程中是否能访问到所需的数据？是否能在需要时进行访问？</li>
-</ul>
-<h2 id="语言"><a href="#语言" class="headerlink" title="语言"></a>语言</h2><blockquote>
-<p>语言的界限就是一个人世界的界限</p>
-</blockquote>
-<h2 id="抽时间学习shell"><a href="#抽时间学习shell" class="headerlink" title="抽时间学习shell"></a>抽时间学习shell</h2><h2 id="按合约设计"><a href="#按合约设计" class="headerlink" title="按合约设计"></a>按合约设计</h2><p>简称DBC,软件系统中的每一个函数和方法都会做某件事情。在开始做某事之前，例程对世界的状态可能有某种期望，并且也可能有能力陈述系统结束时的状态。</p>
-<ul>
-<li>前条件（precondition）。为了调用例程，必须为真的条件。</li>
-<li>后条件（postcondition）。例程保证会做的事情。优厚条件这一事实意味着他会结束，不允许无限循环。</li>
-<li>类不变项（class invariant）。类确保从调用者的视角来看，该条件总是为真。在例程得内部处理过程中，不变项不一定会保持，但在例程退出、控制返回到调用者时，不变项必须为真。</li>
-</ul>
-<blockquote>
-<p>Design with Contracts.<br>在“正交性”中，我们建议编写“羞怯”的代码。这里，强调的重点是在“懒惰”的代码上：对在开始之前接受的东西要严格，而允诺返回的东西哟啊尽可能少。记住，如果你的合约表明你将接受任何东西，并允诺返回整个世界，那你就有大量代码要写了。</p>
-</blockquote>
-<h3 id="实现DBC"><a href="#实现DBC" class="headerlink" title="实现DBC"></a>实现DBC</h3><p>在设计时简单地列举<em>输入域的范围</em>是什么、<em>边界条件</em>是什么、<em>例程允诺</em>交付什么，—或者不允诺交付什么。<em>不对这些事项作出陈述，你就回到了靠巧合编程，</em>那是许多项目开始、结束、失败的地方。</p>
-<h3 id="谁负责"><a href="#谁负责" class="headerlink" title="谁负责"></a>谁负责</h3><p>谁负责检查前条件，是调用者，还是被调用的例程？如果作为语言的一部分实现，答案是两者都不是：前条件是在调用者调用例程之后，但在进入例程自身之前，在幕后测试的。因而如果要对参数进行任何显示的检查，就必须由调用者来完成。</p>
-<h2 id="断言"><a href="#断言" class="headerlink" title="断言"></a>断言</h2><blockquote>
-<p>无论何时你发现自己在思考“但那当然不可能发生”，增加代码检查他。最容易的方法是使用断言<br>if it can’t happen, Use Assertions to ensure that it won’t.<br>不仅仅在测试环境打开断言，书中更倾向于生产环境也把断言开着，只把那些特别影响性能的断言关掉。</p>
-</blockquote>
-<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><ul>
-<li>fix the problem, Not the Blame</li>
-<li>don’t panic,无论上面压力多大，或者dead line多近了，首先保持平常心去调试bug。</li>
-<li>责任别外卸, bug 有可能存在于OS、编译器、或是第三方库，但这不应该是你的第一想法。有大得多的可能性的是，bug就存在于正在开发的代码中。</li>
-<li>重现bug,无须弄太多复杂人工操作，有时候一句代码就可以重现了。</li>
-<li>跟反馈人员面谈，搜集更多的数据</li>
-<li>必须强硬地测试<em>边界条件</em>。</li>
-<li><em>不要假定，要证明！</em></li>
-</ul>
-<h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><h3 id="什么是异常情况"><a href="#什么是异常情况" class="headerlink" title="什么是异常情况"></a>什么是异常情况</h3><p>异常很少应作为程序的正常流程的一部分使用；异常应保留给意外事件。假定某个未被抓住的异常会终止你的程序了，问问你自己：“如果移走所有的异常处理器，这些代码是否仍然能运行？”如果答案是“否”，那么异常也许就正在被用在非异常的情形中。<br>e.g. 你的代码试图打开一个文件进行读取，而该文件并不存在，是否应该引发异常，这里分2种情况讨论：</p>
-<ol>
-<li>如果你确定文件就应该在哪里，那么引发异常就有正当理由。</li>
-<li>你不确定文件是否存在，也就找不到文件看来就不是异常情况了，这里适合用错误返回。<blockquote>
-<p>Use Exceptions for Exceptional Problems.<br>异常表示即时的、非局部的控制转移。<br>如果把异常当成正常流程处理的话，代码的可读性和可维护性将受到打击。</p>
-</blockquote>
-</li>
-</ol>
-<h3 id="OC有-try-catch-有异常处理机制，为什么业界好像不怎么推荐使用？"><a href="#OC有-try-catch-有异常处理机制，为什么业界好像不怎么推荐使用？" class="headerlink" title="OC有@try @catch 有异常处理机制，为什么业界好像不怎么推荐使用？"></a>OC有@try @catch 有异常处理机制，为什么业界好像不怎么推荐使用？</h3><ol>
-<li>因为try catch无法捕获UncaughtException，而OC中大部分crash如：<em>内存溢出、野指针等都是无法捕获的</em>，而能捕获的只是像数组越界之类（这真心需要catch么？注：完全可以通过代码判断避免），所以try catch对于OC来说，比较鸡肋。</li>
-<li>简单的来说，Apple虽然同时提供了错误处理（NSError）和异常处理（exception）两种机制，但是Apple更加提倡开发者使用NSError来处理程序运行中可恢复的错误。而异常被推荐用来处理不可恢复的错误。    原因有几个，在非gc情况下，exception容易造成内存管理问题（文档有描述即使是arc下，也不是安全的）；exception使用block造成额外的<em>开销</em>，<em>效率较低</em>等等，另外这也的确是Cocoa开发者的习惯。</li>
-<li>很多人在编程中，错误了使用了Try-Catch，把异常处理机制用在了核心逻辑中。把其当成了一个变种的GOTO使用。把大量的逻辑写在了Catch中。弱弱的说一句，这种情况干嘛不用ifelse呢。<br>综上3点原因，建议大家还是在代码中少用，可以通过判断是否非空、判断数组是否越界等方法进行处理。但是如果需要在代码中处理一些异常，也是可以的。</li>
-</ol>
-<h3 id="错误处理器"><a href="#错误处理器" class="headerlink" title="错误处理器"></a>错误处理器</h3><p>错误处理器是检测到错误调用的例程。</p>
-<h2 id="配平资源"><a href="#配平资源" class="headerlink" title="配平资源"></a>配平资源</h2><p>e.g-》p105 遵循谁打开，谁关闭，谁分配，谁释放原则。与iOS早期的MRC思想一样。</p>
-<h3 id="嵌套的分配"><a href="#嵌套的分配" class="headerlink" title="嵌套的分配"></a>嵌套的分配</h3><ol>
-<li>以与资源分配次序想法的次序解除资源的分配。（reverse）</li>
-<li>在代码不同的地方分配同一组资源时，总是以相同的次序分配他们。（有效降低死锁）</li>
-</ol>
-<h2 id="解耦"><a href="#解耦" class="headerlink" title="解耦"></a>解耦</h2><blockquote>
-<p>保持灵活的一种方法是少写代码。改动代码会使你引入新bug的可能性增大。<br>个人觉得减少重复，减少硬编码的意思。<br>把你的代码组织成最小组织单位（模块），并限制他们的交互。</p>
-</blockquote>
-<h3 id="函数的得墨忒耳定律"><a href="#函数的得墨忒耳定律" class="headerlink" title="函数的得墨忒耳定律"></a>函数的得墨忒耳定律</h3><blockquote>
-<p>Minimize Coupling Between Modules<br>百科了一下<br>很多面向对象程序设计语言用”.”表示对象的域的解析算符，因此得墨忒耳定律可以简单地陈述为“只使用一个.算符”。因此，a.b.Method()违反了此定律，而a.Method()不违反此定律。一个简单例子是，人可以命令一条狗行走（walk），但是不应该直接指挥狗的腿行走，应该由狗去指挥控制它的腿如何行走。</p>
-</blockquote>
-<pre><code>public void show Balance (BankAccount acct) 
-{
-   Money amt = acct.getBalance();
-   printToScreen(amt.printFormat());
-}
-</code></pre><p>acct 为传入参数对象，可以调用acc.getBalance(),但amt.printFormat()就相当于acc.getBalance().printFormat(), 即a.b.Method(),违反了得墨忒耳定律，因此，可略去中间Money对象，直接在BankAccount中新增个printBalance()方法即可。</p>
-<pre><code>public void show Balance (BankAccount acct) 
-{
-   acct.pintBalance();
-}
-</code></pre><p>实践中，其实就意味着编写大量的包装方法，让一个包工头类将请求转发给下面的分工。</p>
-<blockquote>
-<p>一句话就是模块之间仅仅暴露<em>有限 关键</em>信息，作<em>最少</em>交互。</p>
-</blockquote>
-<h2 id="元程序设计"><a href="#元程序设计" class="headerlink" title="元程序设计"></a>元程序设计</h2><h3 id="动态配置"><a href="#动态配置" class="headerlink" title="动态配置"></a>动态配置</h3><p>使系统变得高度可配置，用元数据描述应用的配置选项。（这里说得有点像OSX 的系统偏好设置吧？）</p>
-<h3 id="元数据驱动的应用"><a href="#元数据驱动的应用" class="headerlink" title="元数据驱动的应用"></a>元数据驱动的应用</h3><blockquote>
-<p>put Abstractions in Code, Details in Metadata</p>
-</blockquote>
-<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><blockquote>
-<p>Always Design for Concurrency<br>本书对并发非常看重，还给了个将流程工作向并发操作的小tips:<br>Analyze Workflow to Improve Concurrency<br>将需求流程转化为UML图，其中没有指入箭头的项目可以考虑并发操作。</p>
-</blockquote>
-<h2 id="发布-订阅"><a href="#发布-订阅" class="headerlink" title="发布/订阅"></a>发布/订阅</h2><h2 id="靠巧合编程"><a href="#靠巧合编程" class="headerlink" title="靠巧合编程"></a>靠巧合编程</h2><p>要清楚，我们身处雷区，如果依靠巧合编程，就如同在雷区碰运气排雷一样，随时爆炸身亡了。<br>这个雷我上个月就踩过。<br>当时意识不够，没意识到线上环境是如此大凶险的，擅自用uid为key存储数据了。在开发这个版本的时候，一直没出问题，想当然地认为产品上线也会顺顺利利的，殊不知，在n个版本之前，已经有同事用过uid来存储另一种类型的数据了，尽管这个数据早在版本迭代中废弃没用了，但一直存在与用户机器中。而OC 恰恰又是动态语言，不管你代码写他是什么，数据类型要到运行时才能确定···。<br>种种巧合在这个时间点堆砌起来，bang的一声，就这样炸开了。</p>
-<h3 id="怎么巧合编程"><a href="#怎么巧合编程" class="headerlink" title="怎么巧合编程"></a>怎么巧合编程</h3><p>好了，言归正传，巧合编程主要包括实现的偶然性，语境的偶然性和隐含的假定。<br>当初我犯了实现的偶然性和隐含的假定。假定了在我之前没人用过uid作key存过数据，况且既然版本测试没问题了，就真的没问题了。</p>
-<h3 id="怎样深思熟虑地编程"><a href="#怎样深思熟虑地编程" class="headerlink" title="怎样深思熟虑地编程"></a>怎样深思熟虑地编程</h3><ul>
-<li>总是意识到你在做什么</li>
-<li>不要盲目地编程，使用不熟悉，不理解的第三方库，技术等</li>
-<li>按照计划行事</li>
-<li>依靠可靠的事物。不要依靠<em>巧合</em>或<em>假定</em>。</li>
-<li>为你的假设建立文档。有助于澄清假定，并传递给他人。</li>
-<li>不要只测试你的代码，还要测试你的假定。尝试<em>证明</em>假定。</li>
-<li>为工作划分优先级。把时间花在重要的方面</li>
-<li>不要做历史的奴隶。不要让已有的代码支配将来的代码。如果不再适用，所有的代码都应该替换。</li>
-</ul>
-<h2 id="重构"><a href="#重构" class="headerlink" title="重构"></a>重构</h2><h3 id="when："><a href="#when：" class="headerlink" title="when："></a>when：</h3><ul>
-<li>重复。当发现违反DRY原则的时候。</li>
-<li>非正交设计</li>
-<li>过时的知识</li>
-<li>性能</li>
-</ul>
-<h3 id="why"><a href="#why" class="headerlink" title="why:"></a>why:</h3><p>  把需要重构的代码当做是一种“肿瘤”，你现在可以手术，趁它还小把它取出来，你也可以等他增大并扩散—但那时再切除它就会更昂贵、更危险。等再久一些，“病人”就有可能会丧命。</p>
-<h3 id="how-2"><a href="#how-2" class="headerlink" title="how:"></a>how:</h3><ul>
-<li>不要试图在重构的同时新增功能。</li>
-<li>在开始重构之前，确保你拥有<em>良好的测试</em>。尽可能经常运行这些测试。这样，如果你的改动破坏了任何东西，你就能很快知道。</li>
-<li>采取<em>短小、深思熟虑</em>的步骤：把某个字段从一个类移往另一个，把两个类似的方法融合进超类中。重构常常设计到进行许多局部改动，继而产生更大规模的改动。如果你使你的步骤保持短小，并在每个步骤之后进行测试，你能够后期避免长时间的调试。</li>
-<li>看到不怎么合理的代码时，既要修正他，也要修正依赖于他的每样东西</li>
-<li><h2 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h2></li>
-</ul>
-<h3 id="what-2"><a href="#what-2" class="headerlink" title="what"></a>what</h3><p>在隔离状态下，对每个模块进行测试，目的是检验其行为。<br>软件的单元测试，是指对模块进行演练的代码。</p>
-<h3 id="how-3"><a href="#how-3" class="headerlink" title="how"></a>how</h3><p>编写测试代码，确保给定的单元遵守其合约。通过广泛的测试用例与边界条件，测试模块是否实现了它允诺的功能。<br>测试模块之间相互依赖的情况：<br>依赖于LinkedList 和 Sort 的模块 A</p>
-<ol>
-<li>全面测试Linklist的合约</li>
-<li>全面测试Sort的合约</li>
-<li>测试A的合约，它依赖于另外两个合约，但没有直接暴露他们。<br>这种风格的测试要求你首先测试模块的子组件。一旦子组件得到了检验，就可以测试模块本身。</li>
-</ol>
-<p>之前听过很多大牛的分享，都很强烈使用单元测试。我们项目是否也考虑下引入？</p>
-<h2 id="before-the-Project-在项目开始之前"><a href="#before-the-Project-在项目开始之前" class="headerlink" title="before the Project 在项目开始之前"></a>before the Project 在项目开始之前</h2><h3 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h3><p>需求很少存在于表面上。通常，他们深深埋藏在层层假定、误解和政治手段的下面<br>Don’t gather requirements - Dig for them</p>
-<h4 id="挖掘需求"><a href="#挖掘需求" class="headerlink" title="挖掘需求"></a>挖掘需求</h4><p>Work with a User to think like a User</p>
-<h3 id="建立需求文档"><a href="#建立需求文档" class="headerlink" title="建立需求文档"></a>建立需求文档</h3><p>当遇到一些合适的、描述应用需要做什么的情景，把它们写下来，并发布，每个人都可以以此为据用作讨论的基础文档—开发者、最终用户、以及项目出资人。</p>
-<h4 id="用例图"><a href="#用例图" class="headerlink" title="用例图"></a>用例图</h4><p>可以用UML活动图捕捉工作流，而且有时要为手边的事务建模。概念图很有用，但真正的用例是具有<em>层次结构</em>和<em>交叉链接</em>的文字描述，用例间可以互相嵌套。</p>
-<h4 id="规定过度"><a href="#规定过度" class="headerlink" title="规定过度"></a>规定过度</h4><p>制作需求文档的一大危险是太过具体，好的需求文档会保持抽象，在涉及需求的地方，<em>最简单的、能准确</em>地反应商业需求的陈述是最好的。这并非意味着可以含糊不清—你必须把底层的语意不变项当做需求进行捕捉，并把及的或当前的工作实践当做政策记入文档。<br>  <em>需求不是架构，需求不是设计，也不是用户界面</em></p>
-<h4 id="维护词汇表"><a href="#维护词汇表" class="headerlink" title="维护词汇表"></a>维护词汇表</h4><p>一旦开始讨论需求，用户和领域专家就会使用对他们有特定含义的属于。e.g.“客户”和“顾客”。<br>  要创建并维护项目词汇表（project glossary）—定义项目中使用专业术语的地方。项目的所有参与者，从最终用户到设计人员，都应该使用这个词汇表，以确保<strong>一致性</strong>。</p>
-<h4 id="把项目文档发布到内网上"><a href="#把项目文档发布到内网上" class="headerlink" title="把项目文档发布到内网上"></a>把项目文档发布到内网上</h4><h2 id="解开不可能解开的谜题"><a href="#解开不可能解开的谜题" class="headerlink" title="解开不可能解开的谜题"></a>解开不可能解开的谜题</h2><p>秘诀是确定真正的（而不是想象的）约束，并在其中找出解决方法。有些约束是绝对的；有些则只是<em>先入之见</em>。</p>
-<blockquote>
-<p>Don’t think Outside the Box — find the box.</p>
-</blockquote>
-<h2 id="是良好的判断，还是拖延？"><a href="#是良好的判断，还是拖延？" class="headerlink" title="是良好的判断，还是拖延？"></a>是良好的判断，还是拖延？</h2><p><em>构建原型</em>，选择一个你觉得会有困难的地方，开始进行某种“概念验证”。在典型情况下，可能会发生两种情况：</p>
-<ol>
-<li>开始不久，就觉得自己再浪费时间，这种厌烦可能很好标明了，你最初的勉强只是希望推迟启动。—》<em>放弃原型，回到真正的开发中</em></li>
-<li>随着原型取得进展，可能得到启示：突然意识到有些基本的前提错了。不仅如此，你还清楚的看到可以怎样纠正错误。—》愉快地放弃原型，投入正常的项目。<br>当你做出决定把<em>构建原型</em>当作调查你的不适的一种方法时，一定要记住<strong>为何这样做</strong>。</li>
-</ol>
-<h2 id="规范陷阱"><a href="#规范陷阱" class="headerlink" title="规范陷阱"></a>规范陷阱</h2><p>编写程序规范就是把需求规约到程序员能够接管的程度的过程。这是个交流活动，旨在解释并澄清系统的需求。</p>
-<p><em>没有给编码者留下任何解释余地的设计会剥夺了他们发挥技巧和艺术才能的权利。</em></p>
-<h2 id="圆圈与箭头"><a href="#圆圈与箭头" class="headerlink" title="圆圈与箭头"></a>圆圈与箭头</h2><blockquote>
-<p>Don’t be a slave to Formal Methods<br>Expensive TOOls do not Produce Better Designs<br><em>注重实效的程序员</em>批判的看待方法学，并从各种方法学中提取精华，融合成一套工作习惯。<br>你应该不断努力提炼和改善你的开发过程。绝不要把方法学的代办限制当做你的世界的边界。</p>
-</blockquote>
-<h2 id="注重实效的项目"><a href="#注重实效的项目" class="headerlink" title="注重实效的项目"></a>注重实效的项目</h2><p>一旦参与项目的人员超过一个，你就需要建立一些基本原则，并相应地分派任务。</p>
-<h3 id="注重实效的团队"><a href="#注重实效的团队" class="headerlink" title="注重实效的团队"></a>注重实效的团队</h3><h4 id="不要留破窗户"><a href="#不要留破窗户" class="headerlink" title="不要留破窗户"></a>不要留破窗户</h4><h4 id="煮青蛙"><a href="#煮青蛙" class="headerlink" title="煮青蛙"></a>煮青蛙</h4><p>确保每个人主动监视环境的变化—监视好任何不在最初约定中的东西。</p>
-<h4 id="交流"><a href="#交流" class="headerlink" title="交流"></a>交流</h4><h4 id="DRY"><a href="#DRY" class="headerlink" title="DRY"></a>DRY</h4><h4 id="正交性-1"><a href="#正交性-1" class="headerlink" title="正交性"></a>正交性</h4><p>按照功能划分团队。让各团队按照个人的能力，在内部自行进行组织。每个团队都按照他们约定的承诺，对项目中的其他团队富有责任。<br>我们是在需求内聚的、在很大程序上自足的团队—和使代码模块化是使用的标准完全一样</p>
-<h4 id="自动化"><a href="#自动化" class="headerlink" title="自动化"></a>自动化</h4><ul>
-<li>一切都要自动化_<br>don’t use manual Procedure<br>使用shell脚本，cron自动化工具</li>
-<li>项目编译<br>makefile</li>
-<li>生成代码</li>
-<li>回归测试</li>
-</ul>
-<h3 id="无情的测试"><a href="#无情的测试" class="headerlink" title="无情的测试"></a>无情的测试</h3><p>开发过程中就要找到自己的bug,以免以后经受由他人找到我们的不过所带来的羞耻。</p>
-<blockquote>
-<p>test early, test often, test automatically.<br>好的项目拥有的测试代码可能比产品代码还要多。<br>coding ain’t done till all the tests run</p>
-</blockquote>
-<h4 id="what-3"><a href="#what-3" class="headerlink" title="what"></a>what</h4><ul>
-<li>单元测试</li>
-<li>集成测试</li>
-<li>验证和校验</li>
-<li>资源耗尽、错误及恢复</li>
-<li>性能测试</li>
-<li>可用性测试</li>
-</ul>
-<h5 id="单元测试-1"><a href="#单元测试-1" class="headerlink" title="单元测试"></a>单元测试</h5><p>对某个模块进行演练的代码</p>
-<h5 id="集成测试"><a href="#集成测试" class="headerlink" title="集成测试"></a>集成测试</h5><p>检测多个模块所组成的系统的集成问题</p>
-<h5 id="验证和校验"><a href="#验证和校验" class="headerlink" title="验证和校验"></a>验证和校验</h5><p>是否用户所需？是否满足系统的功能需求？</p>
-<h5 id="资源耗尽、错误及恢复"><a href="#资源耗尽、错误及恢复" class="headerlink" title="资源耗尽、错误及恢复"></a>资源耗尽、错误及恢复</h5><p>代码可能遇到的一些限制包括：</p>
-<ul>
-<li>内存空间</li>
-<li>磁盘空间</li>
-<li>CPU带宽</li>
-<li>挂钟时间</li>
-<li>磁盘带宽</li>
-<li>网络带宽</li>
-<li>调色板</li>
-<li>视频分辨率<h5 id="性能测试"><a href="#性能测试" class="headerlink" title="性能测试"></a>性能测试</h5></li>
-<li>性能测试</li>
-<li>压力测试</li>
-<li>负载测试<br>是否满足一下的性能需求— 预期的用户数、连接数、或每秒的事务数？<h4 id="how-4"><a href="#how-4" class="headerlink" title="how"></a>how</h4><h5 id="回归测试"><a href="#回归测试" class="headerlink" title="回归测试"></a>回归测试</h5>把当前测试的输出与之前的（或已知的）进行对比。确认今天修的bug没有破坏昨天的代码。<h5 id="测试数据"><a href="#测试数据" class="headerlink" title="测试数据"></a>测试数据</h5></li>
-<li>大量</li>
-<li>强调边界条件</li>
-<li>具有特定统计属性的数据<h5 id="演练GUI系统"><a href="#演练GUI系统" class="headerlink" title="演练GUI系统"></a>演练GUI系统</h5></li>
-</ul>
-<h5 id="对测试进行测试"><a href="#对测试进行测试" class="headerlink" title="对测试进行测试"></a>对测试进行测试</h5><blockquote>
-<p>use Saboteurs to test your Testing<br>故意引入bug,并证实测试能抓住他们</p>
-</blockquote>
-<h5 id="彻底测试"><a href="#彻底测试" class="headerlink" title="彻底测试"></a>彻底测试</h5><blockquote>
-<p>test state Coverage, Not code Cerage<br>测试尝试去覆盖所有代码的状态。</p>
-</blockquote>
-<h4 id="when-1"><a href="#when-1" class="headerlink" title="when"></a>when</h4><p>任何产品代码一旦存在，就需要进行测试<br>大多数测试都应该自动完成。<br>一旦测试人员找到了某个bug,应该对自动化测试进行修改，从此每次都自动化的检查那个特定的bug</p>
-<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p>为项目制作的文档基本上有两种：内部文档和外部文档。</p>
-<h3 id="内部文档"><a href="#内部文档" class="headerlink" title="内部文档"></a>内部文档</h3><h4 id="代码中的注释"><a href="#代码中的注释" class="headerlink" title="代码中的注释"></a>代码中的注释</h4><p>注释应该讨论为何做某事、它的目的和目标（因为代码已经说明他是怎么完成的）。<br>我们喜欢看到见得模块级头注释、关于重要数据与类型的注释、以及给每个类和没个方法所加的简要头注释，用以描述函数的<em>用法</em>和<em>任何不明了的</em>事情。 </p>
-<h2 id="傲慢与偏见"><a href="#傲慢与偏见" class="headerlink" title="傲慢与偏见"></a>傲慢与偏见</h2><blockquote>
-<p>注重实效的程序员不会逃避责任。相反，我们乐于接受挑战，乐于是我们的专业知识广为人知。<br>不应该怀着猜忌心组织要查看你的代码的人；出于同样的原因，你应该带着尊重对待他人的代码。</p>
-</blockquote>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1991,7 +1818,7 @@ p = &amp;a;
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2002,7 +1829,7 @@ p = &amp;a;
           
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
